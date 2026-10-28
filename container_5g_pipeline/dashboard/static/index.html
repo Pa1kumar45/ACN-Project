@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5G Core SmartLB — Predictive & Slice-Aware AMF Autoscaling</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="brand">
+        <span class="brand-title">5G Core SmartLB</span>
+        <span class="brand-badge">NITK Surathkal</span>
+      </div>
+    </div>
+
+    <!-- Multi-Page Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-btn-live" data-tab="live" onclick="switchTab('live')">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Live Slices & Processing
+      </button>
+      <button class="nav-tab" id="tab-btn-fleet" data-tab="fleet" onclick="switchTab('fleet')">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        Container Fleet
+      </button>
+      <button class="nav-tab" id="tab-btn-benchmarks" data-tab="benchmarks" onclick="switchTab('benchmarks')">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        Model Benchmarks
+      </button>
+    </div>
+
+    <div class="nav-right">
+      <div class="status-indicator online">
+        <span class="status-dot"></span>
+        <span class="status-text">Socket :8383 Online</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Multi-Page Container -->
+  <main class="page-container">
+
+    <!-- ================= PAGE 1: LIVE SLICES & PROCESSING ================= -->
+    <section id="page-live" class="tab-page active">
+      <!-- Minimalist Control Strip -->
+      <div class="control-strip card">
+        <!-- Trace Selector -->
+        <div class="control-item">
+          <label>Workload Trace</label>
+          <select id="select-dataset" class="select-input">
+            <option value="flash_crowd_surge.csv">Flash Crowd IoT Storm (ScaleLB Fig 5)</option>
+            <option value="diurnal_cycle.csv">Diurnal Cellular Cycle</option>
+            <option value="linear_ramp.csv">Linear Traffic Ramp</option>
+          </select>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="control-item">
+          <label>Architecture</label>
+          <div class="pill-toggle">
+            <button class="toggle-btn active" id="btn-mode-proposed">⚡ Proposed (Priority Q)</button>
+            <button class="toggle-btn" id="btn-mode-baseline">⚠️ Baseline (Single FIFO)</button>
+            <button class="toggle-btn" id="btn-mode-compare">📊 Compare Overlay</button>
+          </div>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="control-item playback-item">
+          <label>Simulation Playback</label>
+          <div class="playback-controls">
+            <button id="btn-play" class="btn btn-primary">
+              <svg id="play-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span id="play-label">Play</span>
+            </button>
+            <button id="btn-reset" class="btn btn-secondary">Reset</button>
+            <div class="speed-selector">
+              <button class="sp-btn" data-speed="1">1x</button>
+              <button class="sp-btn active" data-speed="2">2x</button>
+              <button class="sp-btn" data-speed="5">5x</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="control-item progress-item">
+          <div class="progress-info">
+            <span class="progress-time" id="progress-time">t = 0s / 240s</span>
+            <span class="autoscaler-pill" id="action-pill">HOLD</span>
+          </div>
+          <div class="progress-track"><div id="progress-bar" class="progress-fill"></div></div>
+        </div>
+      </div>
+
+      <!-- SLA Notification Bar (Only alerts when important) -->
+      <div id="sla-alert" class="alert-bar success">
+        <span class="alert-icon" id="alert-icon">🛡️</span>
+        <div class="alert-content">
+          <strong id="alert-title">Priority Queue Active:</strong>
+          <span id="alert-msg">URLLC bypasses queue directly (< 5ms SLA respected). mMTC IoT storm is buffered safely.</span>
+        </div>
+      </div>
+
+      <!-- Clean 4-Card KPI Strip -->
+      <div class="kpi-grid">
+        <!-- URLLC -->
+        <div class="kpi-box urllc-box" id="kpi-urllc-box">
+          <div class="kpi-top">
+            <span class="slice-badge urllc">URLLC • Slice 1</span>
+            <span class="sla-target">&lt; 5ms SLA</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="val-urllc">3.18</span>
+            <span class="kpi-unit">ms</span>
+          </div>
+          <div class="kpi-foot" id="sub-urllc">Non-blocking Bypass</div>
+        </div>
+
+        <!-- eMBB -->
+        <div class="kpi-box embb-box">
+          <div class="kpi-top">
+            <span class="slice-badge embb">eMBB • Slice 0</span>
+            <span class="sla-target">10–25ms Target</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="val-embb">14.2</span>
+            <span class="kpi-unit">ms</span>
+          </div>
+          <div class="kpi-foot">Broadband FIFO Queue</div>
+        </div>
+
+        <!-- mMTC -->
+        <div class="kpi-box mmtc-box">
+          <div class="kpi-top">
+            <span class="slice-badge mmtc">mMTC • Slice 2</span>
+            <span class="sla-target">Delay-Tolerant</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="val-mmtc">24.5</span>
+            <span class="kpi-unit">ms</span>
+          </div>
+          <div class="kpi-foot">Token Bucket Throttled</div>
+        </div>
+
+        <!-- Active AMFs -->
+        <div class="kpi-box fleet-box">
+          <div class="kpi-top">
+            <span class="slice-badge amf">Active AMFs</span>
+            <span class="sla-target" id="val-forecast">Lookahead: 35 rps</span>
+          </div>
+          <div class="kpi-value-row">
+            <span class="kpi-number" id="val-amfs">1</span>
+            <span class="kpi-unit">containers</span>
+          </div>
+          <div class="kpi-foot" id="sub-amfs">Capacity: 100 req/s</div>
+        </div>
+      </div>
+
+      <!-- Clean 2-Chart Layout -->
+      <div class="charts-grid">
+        <!-- Chart 1: Traffic Demand vs LSTM Prediction -->
+        <div class="chart-card card">
+          <div class="card-header">
+            <div>
+              <h3>Traffic Demand & 45s Predictive Scaling</h3>
+              <p class="card-desc">LSTM anticipates the 320 req/s surge 45s early to warm up containers</p>
+            </div>
+            <div class="view-toggle">
+              <button class="chart-btn" id="btn-chart1-stream">Dynamic Stream</button>
+              <button class="chart-btn active" id="btn-chart1-full">Full Trace</button>
+            </div>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="chartDemand"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Per-Slice Latency Isolation -->
+        <div class="chart-card card">
+          <div class="card-header">
+            <div>
+              <h3>Per-Slice Latency & 3GPP SLA (5ms)</h3>
+              <p class="card-desc">URLLC locked strictly below 5ms vs Baseline bufferhead delay</p>
+            </div>
+            <div class="view-toggle">
+              <span class="legend-badge-purple">URLLC</span>
+              <span class="legend-badge-cyan">eMBB</span>
+              <span class="legend-badge-amber">mMTC</span>
+            </div>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="chartLatency"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PAGE 2: CONTAINER FLEET ================= -->
+    <section id="page-fleet" class="tab-page">
+      <div class="fleet-summary card">
+        <div class="fleet-summary-header">
+          <div>
+            <h3>AMF Worker Container Topology</h3>
+            <p class="card-desc">Auto-scaled worker fleet managed by the LSTM Autoscaler daemon</p>
+          </div>
+          <div class="formula-badge">
+            Scaling Policy: <code>N(t) = ceil( λ̂(t+45) / (μ · γ) )</code>
+          </div>
+        </div>
+        <div class="fleet-metrics-strip">
+          <div class="f-metric">
+            <span class="f-lbl">Service Rate (μ)</span>
+            <span class="f-val">100 req/s / worker</span>
+          </div>
+          <div class="f-metric">
+            <span class="f-lbl">Target Utilization (γ)</span>
+            <span class="f-val">80%</span>
+          </div>
+          <div class="f-metric">
+            <span class="f-lbl">Cold-Start Delay</span>
+            <span class="f-val">40.0s (AMF Boot)</span>
+          </div>
+          <div class="f-metric">
+            <span class="f-lbl">LSTM Lookahead (H)</span>
+            <span class="f-val">45.0s (Overcomes Lag)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container Cards Grid -->
+      <div class="worker-grid" id="worker-grid">
+        <!-- Dynamically injected -->
+      </div>
+    </section>
+
+    <!-- ================= PAGE 3: MODEL BENCHMARKS ================= -->
+    <section id="page-benchmarks" class="tab-page">
+      <div class="benchmark-header card">
+        <div>
+          <h3>Table I Validation: Forecasting Model Evaluation</h3>
+          <p class="card-desc">Chronological Train (70%) vs Test (30%) split across all synthetic 5G workload traces</p>
+        </div>
+        <div class="best-model-pill">
+          ★ LSTM Forecaster: Lowest RMSE on Flash Crowd Surges
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <div class="table-container" id="benchmark-table-container">
+          <!-- Dynamically injected -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

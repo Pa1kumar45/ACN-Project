@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  loadbalancer:
+    build: ./services/load_balancer
+    container_name: 5g-smart-loadbalancer
+    ports:
+      - "8383:8383"
+    environment:
+      - PORT=8383
+      - AMF_ENDPOINTS=http://amf-worker-1:8000,http://amf-worker-2:8000,http://amf-worker-3:8000
+    networks:
+      - 5g-net
+    depends_on:
+      - amf-worker-1
+
+  amf-worker-1:
+    build: ./services/amf_worker
+    container_name: amf-worker-1
+    environment:
+      - AMF_ID=amf-worker-1
+      - PORT=8000
+      - SERVICE_TIME_MS=10.0
+      - BOOT_DELAY_SEC=2.0
+    networks:
+      - 5g-net
+
+  autoscaler:
+    build: ./services/autoscaler
+    container_name: 5g-lstm-autoscaler
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - LB_URL=http://loadbalancer:8383/metrics
+      - PORT=8080
+      - AMF_CAPACITY=100.0
+      - TARGET_GAMMA=0.80
+      - HORIZON_SEC=45
+      - DOCKER_SCALE_SERVICE=amf-worker
+    networks:
+      - 5g-net
+    depends_on:
+      - loadbalancer
+
+  traffic-replayer:
+    build: ./services/traffic_replayer
+    container_name: 5g-traffic-replayer
+    volumes:
+      - ./dataset:/app/dataset
+    environment:
+      - LB_DISPATCH_URL=http://loadbalancer:8383/dispatch
+      - DATASET_PATH=/app/dataset/flash_crowd_surge.csv
+      - REPLAY_SPEED=2.0
+    networks:
+      - 5g-net
+    depends_on:
+      - loadbalancer
+
+networks:
+  5g-net:
+    driver: bridge

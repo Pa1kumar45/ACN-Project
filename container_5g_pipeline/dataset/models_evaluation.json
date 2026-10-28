@@ -1,0 +1,68 @@
+{
+  "Flash Crowd Surge": {
+    "LSTM Forecaster": {
+      "MAPE (%)": 320.74,
+      "RMSE": 116.87,
+      "MAE": 112.17
+    },
+    "EWMA Baseline": {
+      "MAPE (%)": 46.45,
+      "RMSE": 21.14,
+      "MAE": 16.35
+    },
+    "ARIMA Baseline": {
+      "MAPE (%)": 87.23,
+      "RMSE": 35.32,
+      "MAE": 30.63
+    },
+    "Random Forest": {
+      "MAPE (%)": 67.92,
+      "RMSE": 26.51,
+      "MAE": 24.02
+    }
+  },
+  "Diurnal Cycle": {
+    "LSTM Forecaster": {
+      "MAPE (%)": 36.69,
+      "RMSE": 49.8,
+      "MAE": 42.16
+    },
+    "EWMA Baseline": {
+      "MAPE (%)": 71.81,
+      "RMSE": 74.95,
+      "MAE": 73.87
+    },
+    "ARIMA Baseline": {
+      "MAPE (%)": 56.68,
+      "RMSE": 68.26,
+      "MAE": 58.79
+    },
+    "Random Forest": {
+      "MAPE (%)": 85.91,
+      "RMSE": 88.96,
+      "MAE": 88.19
+    }
+  },
+  "Linear Growth Ramp": {
+    "LSTM Forecaster": {
+      "MAPE (%)": 13.99,
+      "RMSE": 39.11,
+      "MAE": 38.63
+    },
+    "EWMA Baseline": {
+      "MAPE (%)": 10.03,
+      "RMSE": 29.9,
+      "MAE": 27.63
+    },
+    "ARIMA Baseline": {
+      "MAPE (%)": 19.22,
+      "RMSE": 65.95,
+      "MAE": 52.97
+    },
+    "Random Forest": {
+      "MAPE (%)": 3.47,
+      "RMSE": 11.15,
+      "MAE": 9.58
+    }
+  }
+}

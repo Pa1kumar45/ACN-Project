@@ -1,0 +1,9 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY app.py .
+ENV AMF_ID=amf-1
+ENV PORT=8000
+ENV SERVICE_TIME_MS=10.0
+ENV BOOT_DELAY_SEC=5.0
+EXPOSE 8000
+CMD ["python", "app.py"]

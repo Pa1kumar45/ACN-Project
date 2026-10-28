@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5G Core AMF Predictive Auto-Scaling & Priority Slicing Simulator</title>
+  <meta name="description" content="Interactive Simulation GUI for Predictive and Slice-Aware Load Balancing and Auto-Scaling of AMFs in the 5G Core Control Plane.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark-theme">
+  <!-- Top Navigation Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <span class="logo-pulse"></span>
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="header-title">
+        <div class="title-row">
+          <h1>5G Core Control-Plane Auto-Scaler</h1>
+          <span class="badge badge-primary">SBA-gRPC-5G + SimPy</span>
+          <span class="badge badge-accent">NITK Surathkal</span>
+        </div>
+        <p class="subtitle">Predictive (LSTM) & Slice-Aware Load Balancing of AMFs &bull; ScaleLB Extension</p>
+      </div>
+    </div>
+
+    <div class="header-center">
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="tab-simulation" id="nav-sim-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Live Simulation
+        </button>
+        <button class="nav-tab" data-tab="tab-experiments" id="nav-exp-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+          Table I Experiments (E1–E7)
+        </button>
+        <button class="nav-tab" data-tab="tab-architecture" id="nav-arch-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          Architecture & Math
+        </button>
+      </nav>
+    </div>
+
+    <div class="header-right">
+      <div class="authors-dropdown">
+        <span class="authors-badge">NITK Team</span>
+        <div class="authors-popup">
+          <div class="author-item"><strong>Jaivant Kosaraju</strong> (231IT028)</div>
+          <div class="author-item"><strong>Paluru Pavan Kumar</strong> (231IT046)</div>
+          <div class="author-item"><strong>Paluvadi Dinesh Manideep</strong> (231IT047)</div>
+          <div class="author-affil">Dept of IT, NITK Surathkal &bull; ACN Course</div>
+        </div>
+      </div>
+      <div class="status-indicator online">
+        <span class="status-dot"></span>
+        <span class="status-text" id="engine-status">Engine Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main">
+
+    <!-- ============================================================= -->
+    <!-- TAB 1: LIVE SIMULATION & ARCHITECTURE VISUALIZER              -->
+    <!-- ============================================================= -->
+    <section id="tab-simulation" class="tab-content active">
+      <!-- Top Control Bar -->
+      <div class="control-bar glass-panel">
+        <div class="control-group">
+          <label for="workload-select">Workload Trace</label>
+          <select id="workload-select" class="custom-select">
+            <option value="flash_crowd">Flash Crowd / mMTC Storm (ScaleLB Fig 5)</option>
+            <option value="diurnal">Diurnal (Sinusoid + Noise)</option>
+            <option value="ramp">Linear Ramp (Sustained Growth)</option>
+            <option value="markov_poisson">Markov-Modulated Poisson</option>
+            <option value="uniform">ScaleLB Paper Uniform (White Noise)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="policy-select">Scaling Policy</label>
+          <select id="policy-select" class="custom-select">
+            <option value="lstm" selected>Proposed: LSTM Predictive (H=45s)</option>
+            <option value="scalelb_reactive">ScaleLB Reactive (Eq. 2: Load > 1.0)</option>
+            <option value="scalelb_proactive">ScaleLB Proactive (Eq. 1: γ=0.80)</option>
+            <option value="warm_standby">Warm Standby (1 Pre-Booted Spare)</option>
+            <option value="static">Static Provisioning (All AMFs On)</option>
+            <option value="ewma">EWMA Forecaster Baseline</option>
+            <option value="arima">ARIMA Forecaster Baseline</option>
+            <option value="rf">Random Forest Forecaster</option>
+          </select>
+        </div>
+
+        <div class="control-group switch-group">
+          <label for="pq-switch">Slice Priority Queuing</label>
+          <div class="switch-wrapper">
+            <input type="checkbox" id="pq-switch" checked>
+            <label for="pq-switch" class="switch-slider"></label>
+            <span class="switch-label" id="pq-label">O1 ACTIVE</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="btn-run-full" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Run Full Sim
+          </button>
+          <button id="btn-play-pause" class="btn btn-secondary">
+            <svg id="play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="play-text">Play Realtime</span>
+          </button>
+          <button id="btn-step" class="btn btn-ghost" title="Step forward 1 second">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+            Step +1s
+          </button>
+          <button id="btn-reset" class="btn btn-ghost" title="Reset simulation">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset
+          </button>
+          <button id="btn-inject-surge" class="btn btn-warning" title="Inject an immediate 10x mMTC registration storm">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Surge +150 req/s
+          </button>
+        </div>
+
+        <div class="speed-controls">
+          <span class="speed-label">Speed:</span>
+          <button class="speed-btn" data-speed="1">1x</button>
+          <button class="speed-btn active" data-speed="3">3x</button>
+          <button class="speed-btn" data-speed="8">8x</button>
+        </div>
+      </div>
+
+      <!-- Live KPI Metrics Strip -->
+      <div class="metrics-strip">
+        <div class="kpi-card kpi-urllc">
+          <div class="kpi-header">
+            <span class="kpi-tag urllc-tag">URLLC Slice (S-NSSAI 1)</span>
+            <span class="kpi-sla" id="urllc-sla-badge">Target &lt; 5.0 ms</span>
+          </div>
+          <div class="kpi-body">
+            <span class="kpi-val" id="metric-urllc-lat">3.12</span>
+            <span class="kpi-unit">ms</span>
+            <span class="kpi-sub" id="metric-urllc-p99">p99: 4.2 ms</span>
+          </div>
+          <div class="kpi-footer">Fast-Lane Queue Bypass Active</div>
+        </div>
+
+        <div class="kpi-card kpi-embb">
+          <div class="kpi-header">
+            <span class="kpi-tag embb-tag">eMBB Slice (S-NSSAI 0)</span>
+            <span class="kpi-sub">Standard FIFO</span>
+          </div>
+          <div class="kpi-body">
+            <span class="kpi-val" id="metric-embb-lat">8.45</span>
+            <span class="kpi-unit">ms</span>
+            <span class="kpi-sub" id="metric-embb-p99">p99: 14.8 ms</span>
+          </div>
+          <div class="kpi-footer">FIFO Queue &bull; Balanced</div>
+        </div>
+
+        <div class="kpi-card kpi-mmtc">
+          <div class="kpi-header">
+            <span class="kpi-tag mmtc-tag">mMTC Slice (S-NSSAI 2)</span>
+            <span class="kpi-sub">Token Bucket Throttled</span>
+          </div>
+          <div class="kpi-body">
+            <span class="kpi-val" id="metric-mmtc-lat">28.4</span>
+            <span class="kpi-unit">ms</span>
+            <span class="kpi-sub" id="metric-mmtc-p99">p99: 42.1 ms</span>
+          </div>
+          <div class="kpi-footer" id="metric-mmtc-aging">Aging Bound Active &bull; No Starvation</div>
+        </div>
+
+        <div class="kpi-card kpi-amf">
+          <div class="kpi-header">
+            <span class="kpi-tag amf-tag">AMF Instance Pool</span>
+            <span class="kpi-sub" id="metric-tboot">Tboot = 40s</span>
+          </div>
+          <div class="kpi-body">
+            <div class="amf-counter-row">
+              <div class="amf-stat"><span class="amf-num green" id="metric-active-amfs">3</span> <span class="amf-lbl">Active</span></div>
+              <div class="amf-stat"><span class="amf-num amber" id="metric-booting-amfs">1</span> <span class="amf-lbl">Booting</span></div>
+              <div class="amf-stat"><span class="amf-num slate" id="metric-draining-amfs">0</span> <span class="amf-lbl">Draining</span></div>
+            </div>
+          </div>
+          <div class="kpi-footer" id="metric-target-n">Formula N(t) = 4 AMFs</div>
+        </div>
+
+        <div class="kpi-card kpi-cost">
+          <div class="kpi-header">
+            <span class="kpi-tag cost-tag">Resource Efficiency</span>
+            <span class="kpi-sub">AMF Cost</span>
+          </div>
+          <div class="kpi-body">
+            <span class="kpi-val" id="metric-amf-seconds">480</span>
+            <span class="kpi-unit">AMF&bull;s</span>
+            <span class="kpi-sub" id="metric-cold-start">0s Cold Start Lag</span>
+          </div>
+          <div class="kpi-footer" id="metric-cpu-util">Avg CPU: 74.2%</div>
+        </div>
+      </div>
+
+      <!-- Live 5G Architecture Network Canvas -->
+      <div class="canvas-panel glass-panel">
+        <div class="panel-header">
+          <div class="panel-title-group">
+            <h2>Real-Time 5G Control-Plane Architecture Visualizer</h2>
+            <span class="panel-sub">S-NSSAI Classifier &bull; Fast-Lane Bypass &bull; Token Bucket Throttling &bull; Predictive Auto-Scaler</span>
+          </div>
+          <div class="canvas-legend">
+            <span class="legend-item"><span class="dot purple"></span> URLLC (Mission Critical)</span>
+            <span class="legend-item"><span class="dot cyan"></span> eMBB (Broadband)</span>
+            <span class="legend-item"><span class="dot amber"></span> mMTC (IoT Storm)</span>
+            <span class="legend-item"><span class="dot green"></span> Active AMF</span>
+            <span class="legend-item"><span class="dot pulse-amber"></span> Booting AMF (~40s)</span>
+          </div>
+        </div>
+        <div class="canvas-container">
+          <canvas id="topoCanvas" width="1200" height="360"></canvas>
+        </div>
+      </div>
+
+      <!-- Live Charts Grid -->
+      <div class="charts-grid">
+        <!-- Chart 1: Per-Slice Latency -->
+        <div class="chart-card glass-panel">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Per-Slice Control-Plane Latency</h3>
+              <span class="chart-desc">URLLC (<5ms target) vs eMBB vs mMTC</span>
+            </div>
+            <div class="chart-badge" id="sla-status-pill">URLLC PROTECTED</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="latencyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Load vs Prediction vs Capacity -->
+        <div class="chart-card glass-panel">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Signaling Rate & LSTM Lookahead</h3>
+              <span class="chart-desc">Actual λ(t) vs Forecast λ̂(t+H) vs Capacity</span>
+            </div>
+            <div class="chart-badge blue">H = 45s LOOKAHEAD</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="loadChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: AMF Instances Dynamics -->
+        <div class="chart-card glass-panel">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>AMF Scaling Dynamics & Booting</h3>
+              <span class="chart-desc">Active vs Booting vs Required N(t)</span>
+            </div>
+            <div class="chart-badge green">EARLY BOOT ACTIVE</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="amfChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: CPU Utilization & Queue Backlog -->
+        <div class="chart-card glass-panel">
+          <div class="chart-header">
+            <div class="chart-title">
+              <h3>Cluster CPU Utilization & Queue Backlog</h3>
+              <span class="chart-desc">Token Bucket Throttles mMTC when CPU > 80%</span>
+            </div>
+            <div class="chart-badge amber">80% THRESHOLD</div>
+          </div>
+          <div class="chart-box">
+            <canvas id="cpuChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collapsible Hyperparameters Drawer -->
+      <div class="params-panel glass-panel">
+        <div class="params-header" id="params-toggle">
+          <div class="params-title">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <h3>Simulation Hyperparameters & Sensitivity Knobs</h3>
+          </div>
+          <span class="params-arrow">&#9660;</span>
+        </div>
+        <div class="params-body" id="params-body">
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>Capacity per AMF (&mu;)</label>
+              <span class="param-val" id="val-mu">100 req/s</span>
+            </div>
+            <input type="range" id="slider-mu" min="40" max="200" step="10" value="100">
+          </div>
+
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>Target Utilization (&gamma;)</label>
+              <span class="param-val" id="val-gamma">0.80</span>
+            </div>
+            <input type="range" id="slider-gamma" min="0.60" max="1.00" step="0.05" value="0.80">
+          </div>
+
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>AMF Boot Time (Tboot)</label>
+              <span class="param-val" id="val-tboot">40 s</span>
+            </div>
+            <input type="range" id="slider-tboot" min="15" max="60" step="5" value="40">
+          </div>
+
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>Forecast Horizon (H)</label>
+              <span class="param-val" id="val-horizon">45 s</span>
+            </div>
+            <input type="range" id="slider-horizon" min="30" max="75" step="5" value="45">
+          </div>
+
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>Safety Margin (m)</label>
+              <span class="param-val" id="val-margin">10 %</span>
+            </div>
+            <input type="range" id="slider-margin" min="0" max="30" step="5" value="10">
+          </div>
+
+          <div class="param-slider-group">
+            <div class="param-info">
+              <label>Slice Mix (URLLC / eMBB / mMTC)</label>
+              <span class="param-val" id="val-mix">10% / 20% / 70%</span>
+            </div>
+            <div class="mix-chips">
+              <button class="chip active" data-mix="10,20,70">Default (10/20/70)</button>
+              <button class="chip" data-mix="5,35,60">Paper Mix (5/35/60)</button>
+              <button class="chip" data-mix="5,15,80">IoT Burst (5/15/80)</button>
+              <button class="chip" data-mix="20,30,50">Critical (20/30/50)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- TAB 2: TABLE I EXPERIMENTS (E1 - E7)                         -->
+    <!-- ============================================================= -->
+    <section id="tab-experiments" class="tab-content">
+      <div class="exp-nav glass-panel">
+        <button class="exp-btn active" data-exp="E1">E1: Forecast Accuracy</button>
+        <button class="exp-btn" data-exp="E2">E2: Ramp & Diurnal Load</button>
+        <button class="exp-btn" data-exp="E3">E3: Flash Crowd & Slicing</button>
+        <button class="exp-btn" data-exp="E4">E4: Scale-Out / Scale-In Hysteresis</button>
+        <button class="exp-btn" data-exp="E5">E5: Forecast Error Injection</button>
+        <button class="exp-btn" data-exp="E6">E6: Component Ablation Study</button>
+        <button class="exp-btn" data-exp="E7">E7: Sensitivity Analysis</button>
+      </div>
+
+      <div class="exp-display glass-panel">
+        <div class="exp-header">
+          <div class="exp-header-text">
+            <h2 id="exp-title">E1: Forecast Accuracy Benchmark</h2>
+            <p id="exp-desc">Evaluating MAPE (%) and RMSE of EWMA, ARIMA, Random Forest, and LSTM across 5 traffic traces.</p>
+          </div>
+          <button id="btn-run-exp" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Execute Experiment
+          </button>
+        </div>
+
+        <div class="exp-body">
+          <div class="exp-chart-container">
+            <canvas id="expChart"></canvas>
+          </div>
+          <div class="exp-results-table" id="exp-table-container">
+            <!-- Dynamic Table will render here -->
+          </div>
+        </div>
+
+        <div class="exp-takeaway glass-panel" id="exp-takeaway-box">
+          <div class="takeaway-badge">KEY RESEARCH TAKEAWAY</div>
+          <p id="exp-takeaway-text">Click "Execute Experiment" to benchmark all models against Table I specifications.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- TAB 3: SYSTEM ARCHITECTURE & MATHEMATICAL FORMULATION         -->
+    <!-- ============================================================= -->
+    <section id="tab-architecture" class="tab-content">
+      <div class="arch-container">
+        <!-- Architecture Diagrams Card -->
+        <div class="arch-card glass-panel">
+          <h2>Extended ScaleLB Architecture (Section IV)</h2>
+          <div class="arch-flow">
+            <div class="arch-step">
+              <span class="step-num">1</span>
+              <h4>RAN Signaling</h4>
+              <p>UEs generate control-plane requests (registration, auth, PDU setup) tagged with slice S-NSSAI (URLLC, eMBB, mMTC).</p>
+            </div>
+            <div class="arch-arrow">&rarr;</div>
+            <div class="arch-step">
+              <span class="step-num">2</span>
+              <h4>Slice Classifier</h4>
+              <p>Extracts S-NSSAI header and subscriber IMSI/NGAP ID for session routing and priority tier assignment.</p>
+            </div>
+            <div class="arch-arrow">&rarr;</div>
+            <div class="arch-step highlight-purple">
+              <span class="step-num">3</span>
+              <h4>Priority Queues</h4>
+              <p><strong>URLLC:</strong> Bypasses queue to fast-lane.<br><strong>eMBB:</strong> FIFO.<br><strong>mMTC:</strong> Token-bucket rate-limited when AMF CPU > 80% with aging.</p>
+            </div>
+            <div class="arch-arrow">&rarr;</div>
+            <div class="arch-step highlight-blue">
+              <span class="step-num">4</span>
+              <h4>LSTM Auto-Scaler</h4>
+              <p>Monitors 60s sliding window, forecasts arrival rate at t+45s, and triggers AMF boot ahead of traffic surges.</p>
+            </div>
+            <div class="arch-arrow">&rarr;</div>
+            <div class="arch-step">
+              <span class="step-num">5</span>
+              <h4>AMF Instance Pool</h4>
+              <p>Least-loaded active AMF handles request; instances transition gracefully: BOOTING (40s) &rarr; ACTIVE &rarr; DRAINING.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulas Card -->
+        <div class="arch-card glass-panel">
+          <h2>Mathematical Scaling Formulations</h2>
+          <div class="math-grid">
+            <div class="math-box">
+              <div class="math-title">ScaleLB Proactive Threshold (Eq. 1)</div>
+              <div class="math-eq">$$\frac{B}{A \times \alpha} \ge \gamma$$</div>
+              <p>Adds an AMF when gNB load ratio crosses threshold &gamma;. Suffers 40s cold-start spike during sudden surges.</p>
+            </div>
+
+            <div class="math-box">
+              <div class="math-title">ScaleLB Reactive Threshold (Eq. 2)</div>
+              <div class="math-eq">$$\frac{B}{A \times \alpha} > 1.0$$</div>
+              <p>Scales only after AMF capacity is completely exhausted. Severe latency degradation and packet drops.</p>
+            </div>
+
+            <div class="math-box highlight-box">
+              <div class="math-title">Our LSTM Predictive Scaling Rule (Eq. 4)</div>
+              <div class="math-eq">$$N(t) = \left\lceil \frac{\hat{\lambda}(t + H)(1 + m)}{\mu \gamma} \right\rceil$$</div>
+              <p>Forecasts arrival rate &lambda;&#770; at lookahead horizon <strong>H &ge; Tboot + &Delta; (45–60s)</strong> with safety margin m. Boots AMFs early to completely eliminate cold-start lag!</p>
+            </div>
+
+            <div class="math-box">
+              <div class="math-title">Hysteresis & Graceful Draining</div>
+              <div class="math-eq">$$\hat{\lambda}(t + H) < 0.40 \times \mu \times A \quad (\text{sustained } 45\text{s})$$</div>
+              <p>Scale-in transitions AMF to DRAINING state: accepts no new sessions, terminates only after active sessions complete.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hybrid Evaluation Plan Card -->
+        <div class="arch-card glass-panel">
+          <h2>Hybrid Evaluation Platform (Section V-F)</h2>
+          <div class="hybrid-cols">
+            <div class="hybrid-col">
+              <h3>1. Discrete-Event Simulator (SimPy)</h3>
+              <ul>
+                <li>Simulates thousands of concurrent UEs and dynamic AMF pools (1–10 instances).</li>
+                <li>Simulates precise container boot delays (Tboot = 40s) and token-bucket release.</li>
+                <li>Logs every single control-plane request for statistical p50/p95/p99 latency percentiles and confidence intervals.</li>
+                <li>Executes all 7 Table I experiments with high repeatability across multiple random seeds.</li>
+              </ul>
+            </div>
+            <div class="hybrid-col">
+              <h3>2. Real 5G SBA Testbed (C++ / Go / Docker)</h3>
+              <ul>
+                <li>Protobuf v3 stubs with S-NSSAI slice type in <code>ngcode.proto</code>.</li>
+                <li>Go gRPC Load Balancer (<code>grpclb/</code>) with Jump Consistent Hashing on IMSI & metadata slice routing.</li>
+                <li>C++ Network Functions (AMF, AUSF, SMF, UPF, SINK) communicating over gRPC SBA.</li>
+                <li>Python REST Microservice (<code>server.py</code>) running the LSTM forecaster on port 8080.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast">Simulation Completed Successfully</div>
+
+  <!-- Custom App JS -->
+  <script src="app.js"></script>
+</body>
+</html>

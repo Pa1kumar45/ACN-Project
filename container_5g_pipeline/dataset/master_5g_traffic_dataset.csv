@@ -1,0 +1,721 @@
+timestamp_s,total_rps,urllc_reqs,embb_reqs,mmtc_reqs,traffic_pattern,theoretical_amfs,global_timestamp_s,trace_source
+0,34.64,3,7,24,Baseline Normal,1,0,flash_crowd_surge
+1,34.57,3,7,24,Baseline Normal,1,1,flash_crowd_surge
+2,34.72,3,7,24,Baseline Normal,1,2,flash_crowd_surge
+3,36.75,4,7,26,Baseline Normal,1,3,flash_crowd_surge
+4,34.68,3,7,24,Baseline Normal,1,4,flash_crowd_surge
+5,31.26,3,6,22,Baseline Normal,1,5,flash_crowd_surge
+6,35.83,4,7,25,Baseline Normal,1,6,flash_crowd_surge
+7,34.33,3,7,24,Baseline Normal,1,7,flash_crowd_surge
+8,34.46,3,7,24,Baseline Normal,1,8,flash_crowd_surge
+9,35.29,4,7,25,Baseline Normal,1,9,flash_crowd_surge
+10,35.58,4,7,25,Baseline Normal,1,10,flash_crowd_surge
+11,37.91,4,8,27,Baseline Normal,1,11,flash_crowd_surge
+12,36.64,4,7,26,Baseline Normal,1,12,flash_crowd_surge
+13,35.28,4,7,25,Baseline Normal,1,13,flash_crowd_surge
+14,33.15,3,7,23,Baseline Normal,1,14,flash_crowd_surge
+15,32.46,3,6,23,Baseline Normal,1,15,flash_crowd_surge
+16,35.62,4,7,25,Baseline Normal,1,16,flash_crowd_surge
+17,38.28,4,8,27,Baseline Normal,1,17,flash_crowd_surge
+18,35.1,4,7,25,Baseline Normal,1,18,flash_crowd_surge
+19,34.73,3,7,24,Baseline Normal,1,19,flash_crowd_surge
+20,36.33,4,7,25,Baseline Normal,1,20,flash_crowd_surge
+21,31.37,3,6,22,Baseline Normal,1,21,flash_crowd_surge
+22,34.22,3,7,24,Baseline Normal,1,22,flash_crowd_surge
+23,36.23,4,7,25,Baseline Normal,1,23,flash_crowd_surge
+24,37.18,4,7,26,Baseline Normal,1,24,flash_crowd_surge
+25,34.4,3,7,24,Baseline Normal,1,25,flash_crowd_surge
+26,35.94,4,7,25,Baseline Normal,1,26,flash_crowd_surge
+27,35.62,4,7,25,Baseline Normal,1,27,flash_crowd_surge
+28,36.96,4,7,26,Baseline Normal,1,28,flash_crowd_surge
+29,32.22,3,6,23,Baseline Normal,1,29,flash_crowd_surge
+30,36.42,4,7,25,Baseline Normal,1,30,flash_crowd_surge
+31,31.21,3,6,22,Baseline Normal,1,31,flash_crowd_surge
+32,28.45,3,6,20,Baseline Normal,1,32,flash_crowd_surge
+33,33.48,3,7,23,Baseline Normal,1,33,flash_crowd_surge
+34,32.71,3,7,23,Baseline Normal,1,34,flash_crowd_surge
+35,37.19,4,7,26,Baseline Normal,1,35,flash_crowd_surge
+36,36.66,4,7,26,Baseline Normal,1,36,flash_crowd_surge
+37,31.95,3,6,22,Baseline Normal,1,37,flash_crowd_surge
+38,37.12,4,7,26,Baseline Normal,1,38,flash_crowd_surge
+39,32.49,3,6,23,Baseline Normal,1,39,flash_crowd_surge
+40,34.78,3,7,24,Baseline Normal,1,40,flash_crowd_surge
+41,34.27,3,7,24,Baseline Normal,1,41,flash_crowd_surge
+42,35.29,4,7,25,Baseline Normal,1,42,flash_crowd_surge
+43,37.05,4,7,26,Baseline Normal,1,43,flash_crowd_surge
+44,36.6,4,7,26,Baseline Normal,1,44,flash_crowd_surge
+45,35.87,4,7,25,Baseline Normal,1,45,flash_crowd_surge
+46,36.62,4,7,26,Baseline Normal,1,46,flash_crowd_surge
+47,36.2,4,7,25,Baseline Normal,1,47,flash_crowd_surge
+48,33.43,3,7,23,Baseline Normal,1,48,flash_crowd_surge
+49,33.21,3,7,23,Baseline Normal,1,49,flash_crowd_surge
+50,33.83,3,7,24,Baseline Normal,1,50,flash_crowd_surge
+51,36.25,4,7,25,Baseline Normal,1,51,flash_crowd_surge
+52,34.37,3,7,24,Baseline Normal,1,52,flash_crowd_surge
+53,40.84,4,8,29,Baseline Normal,1,53,flash_crowd_surge
+54,32.95,3,7,23,Baseline Normal,1,54,flash_crowd_surge
+55,32.25,3,6,23,Baseline Normal,1,55,flash_crowd_surge
+56,36.92,4,7,26,Baseline Normal,1,56,flash_crowd_surge
+57,38.55,4,8,27,Baseline Normal,1,57,flash_crowd_surge
+58,36.26,4,7,25,Baseline Normal,1,58,flash_crowd_surge
+59,37.09,4,7,26,Baseline Normal,1,59,flash_crowd_surge
+60,38.57,4,8,27,Baseline Normal,1,60,flash_crowd_surge
+61,34.76,3,7,24,Baseline Normal,1,61,flash_crowd_surge
+62,31.44,3,6,22,Baseline Normal,1,62,flash_crowd_surge
+63,33.67,3,7,24,Baseline Normal,1,63,flash_crowd_surge
+64,37.38,4,7,26,Baseline Normal,1,64,flash_crowd_surge
+65,31.39,3,6,22,Baseline Normal,1,65,flash_crowd_surge
+66,35.08,4,7,25,Baseline Normal,1,66,flash_crowd_surge
+67,35.63,4,7,25,Baseline Normal,1,67,flash_crowd_surge
+68,34.21,3,7,24,Baseline Normal,1,68,flash_crowd_surge
+69,36.81,4,7,26,Baseline Normal,1,69,flash_crowd_surge
+70,36.45,4,7,26,Baseline Normal,1,70,flash_crowd_surge
+71,40.8,4,8,29,Baseline Normal,1,71,flash_crowd_surge
+72,36.55,4,7,26,Baseline Normal,1,72,flash_crowd_surge
+73,33.48,3,7,23,Baseline Normal,1,73,flash_crowd_surge
+74,33.6,3,7,24,Baseline Normal,1,74,flash_crowd_surge
+75,32.92,3,7,23,Baseline Normal,1,75,flash_crowd_surge
+76,37.38,4,7,26,Baseline Normal,1,76,flash_crowd_surge
+77,33.58,3,7,24,Baseline Normal,1,77,flash_crowd_surge
+78,34.82,3,7,24,Baseline Normal,1,78,flash_crowd_surge
+79,36.87,4,7,26,Baseline Normal,1,79,flash_crowd_surge
+80,32.11,3,6,22,Surge Ramp-Up,1,80,flash_crowd_surge
+81,43.33,4,9,30,Surge Ramp-Up,1,81,flash_crowd_surge
+82,46.63,5,9,33,Surge Ramp-Up,1,82,flash_crowd_surge
+83,59.17,6,12,41,Surge Ramp-Up,1,83,flash_crowd_surge
+84,70.73,7,14,50,Surge Ramp-Up,1,84,flash_crowd_surge
+85,84.16,8,17,59,Surge Ramp-Up,2,85,flash_crowd_surge
+86,96.77,10,19,68,Surge Ramp-Up,2,86,flash_crowd_surge
+87,101.43,10,20,71,Surge Ramp-Up,2,87,flash_crowd_surge
+88,112.05,11,22,78,Surge Ramp-Up,2,88,flash_crowd_surge
+89,121.17,12,24,85,Surge Ramp-Up,2,89,flash_crowd_surge
+90,134.34,13,27,94,Surge Ramp-Up,2,90,flash_crowd_surge
+91,143.07,14,29,100,Surge Ramp-Up,2,91,flash_crowd_surge
+92,150.09,15,30,105,Surge Ramp-Up,2,92,flash_crowd_surge
+93,154.46,15,31,108,Surge Ramp-Up,2,93,flash_crowd_surge
+94,171.61,17,34,120,Surge Ramp-Up,3,94,flash_crowd_surge
+95,179.02,18,36,125,Surge Ramp-Up,3,95,flash_crowd_surge
+96,191.91,19,38,134,Surge Ramp-Up,3,96,flash_crowd_surge
+97,196.38,20,39,137,Surge Ramp-Up,3,97,flash_crowd_surge
+98,213.81,21,43,150,Surge Ramp-Up,3,98,flash_crowd_surge
+99,214.06,21,43,150,Surge Ramp-Up,3,99,flash_crowd_surge
+100,231.37,23,46,162,Surge Ramp-Up,3,100,flash_crowd_surge
+101,234.96,23,47,164,Surge Ramp-Up,3,101,flash_crowd_surge
+102,241.93,24,48,169,Surge Ramp-Up,4,102,flash_crowd_surge
+103,248.99,25,50,174,Surge Ramp-Up,4,103,flash_crowd_surge
+104,262.4,26,52,184,Surge Ramp-Up,4,104,flash_crowd_surge
+105,278.19,28,56,195,Surge Ramp-Up,4,105,flash_crowd_surge
+106,285.27,29,57,200,Surge Ramp-Up,4,106,flash_crowd_surge
+107,294.26,29,59,206,Surge Ramp-Up,4,107,flash_crowd_surge
+108,291.5,29,58,204,Surge Ramp-Up,4,108,flash_crowd_surge
+109,313.34,31,63,219,Surge Ramp-Up,4,109,flash_crowd_surge
+110,323.34,32,65,226,Peak IoT Storm,5,110,flash_crowd_surge
+111,316.7,32,63,222,Peak IoT Storm,4,111,flash_crowd_surge
+112,316.24,32,63,221,Peak IoT Storm,4,112,flash_crowd_surge
+113,319.99,32,64,224,Peak IoT Storm,4,113,flash_crowd_surge
+114,330.35,33,66,231,Peak IoT Storm,5,114,flash_crowd_surge
+115,313.67,31,63,220,Peak IoT Storm,4,115,flash_crowd_surge
+116,317.43,32,63,222,Peak IoT Storm,4,116,flash_crowd_surge
+117,328.17,33,66,230,Peak IoT Storm,5,117,flash_crowd_surge
+118,317.32,32,63,222,Peak IoT Storm,4,118,flash_crowd_surge
+119,317.81,32,64,222,Peak IoT Storm,4,119,flash_crowd_surge
+120,320.59,32,64,224,Peak IoT Storm,5,120,flash_crowd_surge
+121,312.55,31,63,219,Peak IoT Storm,4,121,flash_crowd_surge
+122,321.32,32,64,225,Peak IoT Storm,5,122,flash_crowd_surge
+123,312.74,31,63,219,Peak IoT Storm,4,123,flash_crowd_surge
+124,325.31,33,65,228,Peak IoT Storm,5,124,flash_crowd_surge
+125,320.02,32,64,224,Peak IoT Storm,5,125,flash_crowd_surge
+126,333.7,33,67,234,Peak IoT Storm,5,126,flash_crowd_surge
+127,321.69,32,64,225,Peak IoT Storm,5,127,flash_crowd_surge
+128,328.19,33,66,230,Peak IoT Storm,5,128,flash_crowd_surge
+129,312.18,31,62,219,Peak IoT Storm,4,129,flash_crowd_surge
+130,319.27,32,64,223,Peak IoT Storm,4,130,flash_crowd_surge
+131,321.94,32,64,225,Peak IoT Storm,5,131,flash_crowd_surge
+132,330.47,33,66,231,Peak IoT Storm,5,132,flash_crowd_surge
+133,309.91,31,62,217,Peak IoT Storm,4,133,flash_crowd_surge
+134,325.94,33,65,228,Peak IoT Storm,5,134,flash_crowd_surge
+135,323.55,32,65,226,Peak IoT Storm,5,135,flash_crowd_surge
+136,329.2,33,66,230,Peak IoT Storm,5,136,flash_crowd_surge
+137,324.27,32,65,227,Peak IoT Storm,5,137,flash_crowd_surge
+138,320.31,32,64,224,Peak IoT Storm,5,138,flash_crowd_surge
+139,316.87,32,63,222,Peak IoT Storm,4,139,flash_crowd_surge
+140,315.63,32,63,221,Cool-Down Ramp,4,140,flash_crowd_surge
+141,311.18,31,62,218,Cool-Down Ramp,4,141,flash_crowd_surge
+142,300.33,30,60,210,Cool-Down Ramp,4,142,flash_crowd_surge
+143,298.57,30,60,209,Cool-Down Ramp,4,143,flash_crowd_surge
+144,279.86,28,56,196,Cool-Down Ramp,4,144,flash_crowd_surge
+145,273.62,27,55,192,Cool-Down Ramp,4,145,flash_crowd_surge
+146,257.51,26,52,180,Cool-Down Ramp,4,146,flash_crowd_surge
+147,252.12,25,50,176,Cool-Down Ramp,4,147,flash_crowd_surge
+148,244.91,24,49,171,Cool-Down Ramp,4,148,flash_crowd_surge
+149,237.38,24,47,166,Cool-Down Ramp,3,149,flash_crowd_surge
+150,230.07,23,46,161,Cool-Down Ramp,3,150,flash_crowd_surge
+151,215.35,22,43,151,Cool-Down Ramp,3,151,flash_crowd_surge
+152,202.09,20,40,141,Cool-Down Ramp,3,152,flash_crowd_surge
+153,198.1,20,40,139,Cool-Down Ramp,3,153,flash_crowd_surge
+154,188.81,19,38,132,Cool-Down Ramp,3,154,flash_crowd_surge
+155,179.22,18,36,125,Cool-Down Ramp,3,155,flash_crowd_surge
+156,165.55,17,33,116,Cool-Down Ramp,3,156,flash_crowd_surge
+157,162.47,16,32,114,Cool-Down Ramp,3,157,flash_crowd_surge
+158,149.31,15,30,105,Cool-Down Ramp,2,158,flash_crowd_surge
+159,141.95,14,28,99,Cool-Down Ramp,2,159,flash_crowd_surge
+160,134.46,13,27,94,Cool-Down Ramp,2,160,flash_crowd_surge
+161,122.63,12,25,86,Cool-Down Ramp,2,161,flash_crowd_surge
+162,112.0,11,22,78,Cool-Down Ramp,2,162,flash_crowd_surge
+163,109.03,11,22,76,Cool-Down Ramp,2,163,flash_crowd_surge
+164,92.85,9,19,65,Cool-Down Ramp,2,164,flash_crowd_surge
+165,81.46,8,16,57,Cool-Down Ramp,2,165,flash_crowd_surge
+166,73.39,7,15,51,Cool-Down Ramp,1,166,flash_crowd_surge
+167,68.69,7,14,48,Cool-Down Ramp,1,167,flash_crowd_surge
+168,54.42,5,11,38,Cool-Down Ramp,1,168,flash_crowd_surge
+169,46.32,5,9,32,Cool-Down Ramp,1,169,flash_crowd_surge
+170,37.99,4,8,27,Baseline Normal,1,170,flash_crowd_surge
+171,33.72,3,7,24,Baseline Normal,1,171,flash_crowd_surge
+172,30.68,3,6,21,Baseline Normal,1,172,flash_crowd_surge
+173,35.75,4,7,25,Baseline Normal,1,173,flash_crowd_surge
+174,35.57,4,7,25,Baseline Normal,1,174,flash_crowd_surge
+175,33.48,3,7,23,Baseline Normal,1,175,flash_crowd_surge
+176,37.18,4,7,26,Baseline Normal,1,176,flash_crowd_surge
+177,36.52,4,7,26,Baseline Normal,1,177,flash_crowd_surge
+178,32.51,3,7,23,Baseline Normal,1,178,flash_crowd_surge
+179,36.3,4,7,25,Baseline Normal,1,179,flash_crowd_surge
+180,34.51,3,7,24,Baseline Normal,1,180,flash_crowd_surge
+181,31.29,3,6,22,Baseline Normal,1,181,flash_crowd_surge
+182,36.13,4,7,25,Baseline Normal,1,182,flash_crowd_surge
+183,34.89,3,7,24,Baseline Normal,1,183,flash_crowd_surge
+184,33.14,3,7,23,Baseline Normal,1,184,flash_crowd_surge
+185,36.31,4,7,25,Baseline Normal,1,185,flash_crowd_surge
+186,36.22,4,7,25,Baseline Normal,1,186,flash_crowd_surge
+187,33.56,3,7,23,Baseline Normal,1,187,flash_crowd_surge
+188,36.0,4,7,25,Baseline Normal,1,188,flash_crowd_surge
+189,37.54,4,8,26,Baseline Normal,1,189,flash_crowd_surge
+190,33.22,3,7,23,Baseline Normal,1,190,flash_crowd_surge
+191,35.95,4,7,25,Baseline Normal,1,191,flash_crowd_surge
+192,35.01,4,7,25,Baseline Normal,1,192,flash_crowd_surge
+193,40.67,4,8,28,Baseline Normal,1,193,flash_crowd_surge
+194,30.34,3,6,21,Baseline Normal,1,194,flash_crowd_surge
+195,36.74,4,7,26,Baseline Normal,1,195,flash_crowd_surge
+196,34.23,3,7,24,Baseline Normal,1,196,flash_crowd_surge
+197,34.75,3,7,24,Baseline Normal,1,197,flash_crowd_surge
+198,39.75,4,8,28,Baseline Normal,1,198,flash_crowd_surge
+199,34.98,3,7,24,Baseline Normal,1,199,flash_crowd_surge
+200,40.6,4,8,28,Baseline Normal,1,200,flash_crowd_surge
+201,33.89,3,7,24,Baseline Normal,1,201,flash_crowd_surge
+202,35.88,4,7,25,Baseline Normal,1,202,flash_crowd_surge
+203,33.77,3,7,24,Baseline Normal,1,203,flash_crowd_surge
+204,33.27,3,7,23,Baseline Normal,1,204,flash_crowd_surge
+205,35.16,4,7,25,Baseline Normal,1,205,flash_crowd_surge
+206,34.29,3,7,24,Baseline Normal,1,206,flash_crowd_surge
+207,35.51,4,7,25,Baseline Normal,1,207,flash_crowd_surge
+208,29.74,3,6,21,Baseline Normal,1,208,flash_crowd_surge
+209,40.01,4,8,28,Baseline Normal,1,209,flash_crowd_surge
+210,34.58,3,7,24,Baseline Normal,1,210,flash_crowd_surge
+211,39.36,4,8,28,Baseline Normal,1,211,flash_crowd_surge
+212,32.48,3,6,23,Baseline Normal,1,212,flash_crowd_surge
+213,35.73,4,7,25,Baseline Normal,1,213,flash_crowd_surge
+214,42.91,4,9,30,Baseline Normal,1,214,flash_crowd_surge
+215,32.83,3,7,23,Baseline Normal,1,215,flash_crowd_surge
+216,31.26,3,6,22,Baseline Normal,1,216,flash_crowd_surge
+217,33.63,3,7,24,Baseline Normal,1,217,flash_crowd_surge
+218,36.18,4,7,25,Baseline Normal,1,218,flash_crowd_surge
+219,36.73,4,7,26,Baseline Normal,1,219,flash_crowd_surge
+220,38.23,4,8,27,Baseline Normal,1,220,flash_crowd_surge
+221,34.36,3,7,24,Baseline Normal,1,221,flash_crowd_surge
+222,30.99,3,6,22,Baseline Normal,1,222,flash_crowd_surge
+223,33.91,3,7,24,Baseline Normal,1,223,flash_crowd_surge
+224,38.1,4,8,27,Baseline Normal,1,224,flash_crowd_surge
+225,36.16,4,7,25,Baseline Normal,1,225,flash_crowd_surge
+226,30.11,3,6,21,Baseline Normal,1,226,flash_crowd_surge
+227,34.91,3,7,24,Baseline Normal,1,227,flash_crowd_surge
+228,38.5,4,8,27,Baseline Normal,1,228,flash_crowd_surge
+229,40.32,4,8,28,Baseline Normal,1,229,flash_crowd_surge
+230,36.4,4,7,25,Baseline Normal,1,230,flash_crowd_surge
+231,35.77,4,7,25,Baseline Normal,1,231,flash_crowd_surge
+232,31.9,3,6,22,Baseline Normal,1,232,flash_crowd_surge
+233,32.89,3,7,23,Baseline Normal,1,233,flash_crowd_surge
+234,35.12,4,7,25,Baseline Normal,1,234,flash_crowd_surge
+235,36.26,4,7,25,Baseline Normal,1,235,flash_crowd_surge
+236,36.45,4,7,26,Baseline Normal,1,236,flash_crowd_surge
+237,33.8,3,7,24,Baseline Normal,1,237,flash_crowd_surge
+238,32.12,3,6,22,Baseline Normal,1,238,flash_crowd_surge
+239,33.06,3,7,23,Baseline Normal,1,239,flash_crowd_surge
+0,141.92,14,28,99,Diurnal Sinusoid,2,240,diurnal_cycle
+1,144.62,14,29,101,Diurnal Sinusoid,2,241,diurnal_cycle
+2,147.68,15,30,103,Diurnal Sinusoid,2,242,diurnal_cycle
+3,153.74,15,31,108,Diurnal Sinusoid,2,243,diurnal_cycle
+4,153.23,15,31,107,Diurnal Sinusoid,2,244,diurnal_cycle
+5,150.54,15,30,105,Diurnal Sinusoid,2,245,diurnal_cycle
+6,160.65,16,32,112,Diurnal Sinusoid,3,246,diurnal_cycle
+7,161.02,16,32,113,Diurnal Sinusoid,3,247,diurnal_cycle
+8,163.98,16,33,115,Diurnal Sinusoid,3,248,diurnal_cycle
+9,168.06,17,34,118,Diurnal Sinusoid,3,249,diurnal_cycle
+10,171.25,17,34,120,Diurnal Sinusoid,3,250,diurnal_cycle
+11,177.69,18,36,124,Diurnal Sinusoid,3,251,diurnal_cycle
+12,178.35,18,36,125,Diurnal Sinusoid,3,252,diurnal_cycle
+13,178.83,18,36,125,Diurnal Sinusoid,3,253,diurnal_cycle
+14,178.07,18,36,125,Diurnal Sinusoid,3,254,diurnal_cycle
+15,179.58,18,36,126,Diurnal Sinusoid,3,255,diurnal_cycle
+16,187.21,19,37,131,Diurnal Sinusoid,3,256,diurnal_cycle
+17,194.02,19,39,136,Diurnal Sinusoid,3,257,diurnal_cycle
+18,191.47,19,38,134,Diurnal Sinusoid,3,258,diurnal_cycle
+19,193.37,19,39,135,Diurnal Sinusoid,3,259,diurnal_cycle
+20,198.38,20,40,139,Diurnal Sinusoid,3,260,diurnal_cycle
+21,192.85,19,39,135,Diurnal Sinusoid,3,261,diurnal_cycle
+22,199.8,20,40,140,Diurnal Sinusoid,3,262,diurnal_cycle
+23,205.35,21,41,144,Diurnal Sinusoid,3,263,diurnal_cycle
+24,209.18,21,42,146,Diurnal Sinusoid,3,264,diurnal_cycle
+25,206.98,21,41,145,Diurnal Sinusoid,3,265,diurnal_cycle
+26,211.66,21,42,148,Diurnal Sinusoid,3,266,diurnal_cycle
+27,213.31,21,43,149,Diurnal Sinusoid,3,267,diurnal_cycle
+28,217.56,22,44,152,Diurnal Sinusoid,3,268,diurnal_cycle
+29,212.05,21,42,148,Diurnal Sinusoid,3,269,diurnal_cycle
+30,220.79,22,44,155,Diurnal Sinusoid,3,270,diurnal_cycle
+31,214.42,21,43,150,Diurnal Sinusoid,3,271,diurnal_cycle
+32,211.91,21,42,148,Diurnal Sinusoid,3,272,diurnal_cycle
+33,221.82,22,44,155,Diurnal Sinusoid,3,273,diurnal_cycle
+34,222.38,22,44,156,Diurnal Sinusoid,3,274,diurnal_cycle
+35,231.29,23,46,162,Diurnal Sinusoid,3,275,diurnal_cycle
+36,232.13,23,46,162,Diurnal Sinusoid,3,276,diurnal_cycle
+37,226.22,23,45,158,Diurnal Sinusoid,3,277,diurnal_cycle
+38,236.05,24,47,165,Diurnal Sinusoid,3,278,diurnal_cycle
+39,230.15,23,46,161,Diurnal Sinusoid,3,279,diurnal_cycle
+40,235.25,24,47,165,Diurnal Sinusoid,3,280,diurnal_cycle
+41,235.8,24,47,165,Diurnal Sinusoid,3,281,diurnal_cycle
+42,238.74,24,48,167,Diurnal Sinusoid,3,282,diurnal_cycle
+43,242.8,24,49,170,Diurnal Sinusoid,4,283,diurnal_cycle
+44,243.26,24,49,170,Diurnal Sinusoid,4,284,diurnal_cycle
+45,243.22,24,49,170,Diurnal Sinusoid,4,285,diurnal_cycle
+46,245.46,25,49,172,Diurnal Sinusoid,4,286,diurnal_cycle
+47,245.75,25,49,172,Diurnal Sinusoid,4,287,diurnal_cycle
+48,242.23,24,48,170,Diurnal Sinusoid,4,288,diurnal_cycle
+49,242.7,24,49,170,Diurnal Sinusoid,4,289,diurnal_cycle
+50,244.46,24,49,171,Diurnal Sinusoid,4,290,diurnal_cycle
+51,249.03,25,50,174,Diurnal Sinusoid,4,291,diurnal_cycle
+52,246.65,25,49,173,Diurnal Sinusoid,4,292,diurnal_cycle
+53,257.54,26,52,180,Diurnal Sinusoid,4,293,diurnal_cycle
+54,245.4,25,49,172,Diurnal Sinusoid,4,294,diurnal_cycle
+55,244.68,24,49,171,Diurnal Sinusoid,4,295,diurnal_cycle
+56,252.48,25,50,177,Diurnal Sinusoid,4,296,diurnal_cycle
+57,255.36,26,51,179,Diurnal Sinusoid,4,297,diurnal_cycle
+58,251.88,25,50,176,Diurnal Sinusoid,4,298,diurnal_cycle
+59,253.31,25,51,177,Diurnal Sinusoid,4,299,diurnal_cycle
+60,255.71,26,51,179,Diurnal Sinusoid,4,300,diurnal_cycle
+61,249.59,25,50,175,Diurnal Sinusoid,4,301,diurnal_cycle
+62,244.16,24,49,171,Diurnal Sinusoid,4,302,diurnal_cycle
+63,247.54,25,50,173,Diurnal Sinusoid,4,303,diurnal_cycle
+64,253.22,25,51,177,Diurnal Sinusoid,4,304,diurnal_cycle
+65,243.31,24,49,170,Diurnal Sinusoid,4,305,diurnal_cycle
+66,248.81,25,50,174,Diurnal Sinusoid,4,306,diurnal_cycle
+67,249.21,25,50,174,Diurnal Sinusoid,4,307,diurnal_cycle
+68,246.39,25,49,172,Diurnal Sinusoid,4,308,diurnal_cycle
+69,249.92,25,50,175,Diurnal Sinusoid,4,309,diurnal_cycle
+70,248.66,25,50,174,Diurnal Sinusoid,4,310,diurnal_cycle
+71,254.86,25,51,178,Diurnal Sinusoid,4,311,diurnal_cycle
+72,247.22,25,49,173,Diurnal Sinusoid,4,312,diurnal_cycle
+73,241.4,24,48,169,Diurnal Sinusoid,4,313,diurnal_cycle
+74,240.61,24,48,168,Diurnal Sinusoid,4,314,diurnal_cycle
+75,238.49,24,48,167,Diurnal Sinusoid,3,315,diurnal_cycle
+76,244.52,24,49,171,Diurnal Sinusoid,4,316,diurnal_cycle
+77,237.26,24,47,166,Diurnal Sinusoid,3,317,diurnal_cycle
+78,238.0,24,48,167,Diurnal Sinusoid,3,318,diurnal_cycle
+79,239.97,24,48,168,Diurnal Sinusoid,3,319,diurnal_cycle
+80,232.7,23,47,163,Diurnal Sinusoid,3,320,diurnal_cycle
+81,232.98,23,47,163,Diurnal Sinusoid,3,321,diurnal_cycle
+82,225.29,23,45,158,Diurnal Sinusoid,3,322,diurnal_cycle
+83,226.76,23,45,159,Diurnal Sinusoid,3,323,diurnal_cycle
+84,227.2,23,45,159,Diurnal Sinusoid,3,324,diurnal_cycle
+85,229.45,23,46,161,Diurnal Sinusoid,3,325,diurnal_cycle
+86,230.82,23,46,162,Diurnal Sinusoid,3,326,diurnal_cycle
+87,224.17,22,45,157,Diurnal Sinusoid,3,327,diurnal_cycle
+88,223.43,22,45,156,Diurnal Sinusoid,3,328,diurnal_cycle
+89,221.15,22,44,155,Diurnal Sinusoid,3,329,diurnal_cycle
+90,222.85,22,45,156,Diurnal Sinusoid,3,330,diurnal_cycle
+91,220.07,22,44,154,Diurnal Sinusoid,3,331,diurnal_cycle
+92,215.53,22,43,151,Diurnal Sinusoid,3,332,diurnal_cycle
+93,208.27,21,42,146,Diurnal Sinusoid,3,333,diurnal_cycle
+94,213.77,21,43,150,Diurnal Sinusoid,3,334,diurnal_cycle
+95,209.47,21,42,147,Diurnal Sinusoid,3,335,diurnal_cycle
+96,210.59,21,42,147,Diurnal Sinusoid,3,336,diurnal_cycle
+97,203.27,20,41,142,Diurnal Sinusoid,3,337,diurnal_cycle
+98,208.86,21,42,146,Diurnal Sinusoid,3,338,diurnal_cycle
+99,197.23,20,39,138,Diurnal Sinusoid,3,339,diurnal_cycle
+100,202.62,20,41,142,Diurnal Sinusoid,3,340,diurnal_cycle
+101,194.26,19,39,136,Diurnal Sinusoid,3,341,diurnal_cycle
+102,189.24,19,38,132,Diurnal Sinusoid,3,342,diurnal_cycle
+103,184.27,18,37,129,Diurnal Sinusoid,3,343,diurnal_cycle
+104,185.62,19,37,130,Diurnal Sinusoid,3,344,diurnal_cycle
+105,189.33,19,38,133,Diurnal Sinusoid,3,345,diurnal_cycle
+106,184.29,18,37,129,Diurnal Sinusoid,3,346,diurnal_cycle
+107,181.14,18,36,127,Diurnal Sinusoid,3,347,diurnal_cycle
+108,166.22,17,33,116,Diurnal Sinusoid,3,348,diurnal_cycle
+109,175.88,18,35,123,Diurnal Sinusoid,3,349,diurnal_cycle
+110,172.55,17,35,121,Diurnal Sinusoid,3,350,diurnal_cycle
+111,165.4,17,33,116,Diurnal Sinusoid,3,351,diurnal_cycle
+112,162.34,16,32,114,Diurnal Sinusoid,3,352,diurnal_cycle
+113,162.08,16,32,113,Diurnal Sinusoid,3,353,diurnal_cycle
+114,166.22,17,33,116,Diurnal Sinusoid,3,354,diurnal_cycle
+115,152.31,15,30,107,Diurnal Sinusoid,2,355,diurnal_cycle
+116,152.03,15,30,106,Diurnal Sinusoid,2,356,diurnal_cycle
+117,156.38,16,31,109,Diurnal Sinusoid,2,357,diurnal_cycle
+118,146.34,15,29,102,Diurnal Sinusoid,2,358,diurnal_cycle
+119,143.86,14,29,101,Diurnal Sinusoid,2,359,diurnal_cycle
+120,142.89,14,29,100,Diurnal Sinusoid,2,360,diurnal_cycle
+121,134.72,13,27,94,Diurnal Sinusoid,2,361,diurnal_cycle
+122,137.75,14,28,96,Diurnal Sinusoid,2,362,diurnal_cycle
+123,129.23,13,26,90,Diurnal Sinusoid,2,363,diurnal_cycle
+124,134.8,13,27,94,Diurnal Sinusoid,2,364,diurnal_cycle
+125,128.48,13,26,90,Diurnal Sinusoid,2,365,diurnal_cycle
+126,134.82,13,27,94,Diurnal Sinusoid,2,366,diurnal_cycle
+127,124.03,12,25,87,Diurnal Sinusoid,2,367,diurnal_cycle
+128,125.61,13,25,88,Diurnal Sinusoid,2,368,diurnal_cycle
+129,112.19,11,22,79,Diurnal Sinusoid,2,369,diurnal_cycle
+130,114.19,11,23,80,Diurnal Sinusoid,2,370,diurnal_cycle
+131,113.26,11,23,79,Diurnal Sinusoid,2,371,diurnal_cycle
+132,116.26,12,23,81,Diurnal Sinusoid,2,372,diurnal_cycle
+133,99.89,10,20,70,Diurnal Sinusoid,2,373,diurnal_cycle
+134,107.94,11,22,76,Diurnal Sinusoid,2,374,diurnal_cycle
+135,103.73,10,21,73,Diurnal Sinusoid,2,375,diurnal_cycle
+136,104.91,10,21,73,Diurnal Sinusoid,2,376,diurnal_cycle
+137,99.07,10,20,69,Diurnal Sinusoid,2,377,diurnal_cycle
+138,93.9,9,19,66,Diurnal Sinusoid,2,378,diurnal_cycle
+139,89.12,9,18,62,Diurnal Sinusoid,2,379,diurnal_cycle
+140,83.76,8,17,59,Diurnal Sinusoid,2,380,diurnal_cycle
+141,87.11,9,17,61,Diurnal Sinusoid,2,381,diurnal_cycle
+142,83.18,8,17,58,Diurnal Sinusoid,2,382,diurnal_cycle
+143,89.69,9,18,63,Diurnal Sinusoid,2,383,diurnal_cycle
+144,76.87,8,15,54,Diurnal Sinusoid,1,384,diurnal_cycle
+145,78.34,8,16,55,Diurnal Sinusoid,1,385,diurnal_cycle
+146,68.57,7,14,48,Diurnal Sinusoid,1,386,diurnal_cycle
+147,71.1,7,14,50,Diurnal Sinusoid,1,387,diurnal_cycle
+148,71.61,7,14,50,Diurnal Sinusoid,1,388,diurnal_cycle
+149,71.8,7,14,50,Diurnal Sinusoid,1,389,diurnal_cycle
+150,72.28,7,14,51,Diurnal Sinusoid,1,390,diurnal_cycle
+151,64.35,6,13,45,Diurnal Sinusoid,1,391,diurnal_cycle
+152,58.14,6,12,41,Diurnal Sinusoid,1,392,diurnal_cycle
+153,62.59,6,13,44,Diurnal Sinusoid,1,393,diurnal_cycle
+154,61.02,6,12,43,Diurnal Sinusoid,1,394,diurnal_cycle
+155,59.18,6,12,41,Diurnal Sinusoid,1,395,diurnal_cycle
+156,52.73,5,11,37,Diurnal Sinusoid,1,396,diurnal_cycle
+157,58.44,6,12,41,Diurnal Sinusoid,1,397,diurnal_cycle
+158,52.69,5,11,37,Diurnal Sinusoid,1,398,diurnal_cycle
+159,53.64,5,11,38,Diurnal Sinusoid,1,399,diurnal_cycle
+160,54.5,5,11,38,Diurnal Sinusoid,1,400,diurnal_cycle
+161,50.46,5,10,35,Diurnal Sinusoid,1,401,diurnal_cycle
+162,47.86,5,10,34,Diurnal Sinusoid,1,402,diurnal_cycle
+163,54.08,5,11,38,Diurnal Sinusoid,1,403,diurnal_cycle
+164,45.27,5,9,32,Diurnal Sinusoid,1,404,diurnal_cycle
+165,42.0,4,8,29,Diurnal Sinusoid,1,405,diurnal_cycle
+166,42.59,4,9,30,Diurnal Sinusoid,1,406,diurnal_cycle
+167,47.1,5,9,33,Diurnal Sinusoid,1,407,diurnal_cycle
+168,40.74,4,8,29,Diurnal Sinusoid,1,408,diurnal_cycle
+169,41.5,4,8,29,Diurnal Sinusoid,1,409,diurnal_cycle
+170,43.45,4,9,30,Diurnal Sinusoid,1,410,diurnal_cycle
+171,35.92,4,7,25,Diurnal Sinusoid,1,411,diurnal_cycle
+172,30.44,3,6,21,Diurnal Sinusoid,1,412,diurnal_cycle
+173,38.0,4,8,27,Diurnal Sinusoid,1,413,diurnal_cycle
+174,37.24,4,7,26,Diurnal Sinusoid,1,414,diurnal_cycle
+175,33.49,3,7,23,Diurnal Sinusoid,1,415,diurnal_cycle
+176,39.07,4,8,27,Diurnal Sinusoid,1,416,diurnal_cycle
+177,37.76,4,8,26,Diurnal Sinusoid,1,417,diurnal_cycle
+178,31.17,3,6,22,Diurnal Sinusoid,1,418,diurnal_cycle
+179,37.11,4,7,26,Diurnal Sinusoid,1,419,diurnal_cycle
+180,34.22,3,7,24,Diurnal Sinusoid,1,420,diurnal_cycle
+181,29.1,3,6,20,Diurnal Sinusoid,1,421,diurnal_cycle
+182,36.96,4,7,26,Diurnal Sinusoid,1,422,diurnal_cycle
+183,35.15,4,7,25,Diurnal Sinusoid,1,423,diurnal_cycle
+184,32.61,3,7,23,Diurnal Sinusoid,1,424,diurnal_cycle
+185,38.01,4,8,27,Diurnal Sinusoid,1,425,diurnal_cycle
+186,38.28,4,8,27,Diurnal Sinusoid,1,426,diurnal_cycle
+187,34.49,3,7,24,Diurnal Sinusoid,1,427,diurnal_cycle
+188,38.95,4,8,27,Diurnal Sinusoid,1,428,diurnal_cycle
+189,42.03,4,8,29,Diurnal Sinusoid,1,429,diurnal_cycle
+190,35.81,4,7,25,Diurnal Sinusoid,1,430,diurnal_cycle
+191,40.95,4,8,29,Diurnal Sinusoid,1,431,diurnal_cycle
+192,40.27,4,8,28,Diurnal Sinusoid,1,432,diurnal_cycle
+193,50.23,5,10,35,Diurnal Sinusoid,1,433,diurnal_cycle
+194,34.69,3,7,24,Diurnal Sinusoid,1,434,diurnal_cycle
+195,45.96,5,9,32,Diurnal Sinusoid,1,435,diurnal_cycle
+196,43.07,4,9,30,Diurnal Sinusoid,1,436,diurnal_cycle
+197,45.07,5,9,32,Diurnal Sinusoid,1,437,diurnal_cycle
+198,54.32,5,11,38,Diurnal Sinusoid,1,438,diurnal_cycle
+199,47.99,5,10,34,Diurnal Sinusoid,1,439,diurnal_cycle
+200,58.37,6,12,41,Diurnal Sinusoid,1,440,diurnal_cycle
+201,49.07,5,10,34,Diurnal Sinusoid,1,441,diurnal_cycle
+202,53.74,5,11,38,Diurnal Sinusoid,1,442,diurnal_cycle
+203,51.94,5,10,36,Diurnal Sinusoid,1,443,diurnal_cycle
+204,52.77,5,11,37,Diurnal Sinusoid,1,444,diurnal_cycle
+205,57.46,6,11,40,Diurnal Sinusoid,1,445,diurnal_cycle
+206,57.83,6,12,40,Diurnal Sinusoid,1,446,diurnal_cycle
+207,61.57,6,12,43,Diurnal Sinusoid,1,447,diurnal_cycle
+208,54.19,5,11,38,Diurnal Sinusoid,1,448,diurnal_cycle
+209,72.53,7,15,51,Diurnal Sinusoid,1,449,diurnal_cycle
+210,65.82,7,13,46,Diurnal Sinusoid,1,450,diurnal_cycle
+211,75.47,8,15,53,Diurnal Sinusoid,1,451,diurnal_cycle
+212,66.54,7,13,47,Diurnal Sinusoid,1,452,diurnal_cycle
+213,73.85,7,15,52,Diurnal Sinusoid,1,453,diurnal_cycle
+214,87.51,9,18,61,Diurnal Sinusoid,2,454,diurnal_cycle
+215,73.58,7,15,52,Diurnal Sinusoid,1,455,diurnal_cycle
+216,73.33,7,15,51,Diurnal Sinusoid,1,456,diurnal_cycle
+217,79.43,8,16,56,Diurnal Sinusoid,1,457,diurnal_cycle
+218,85.84,9,17,60,Diurnal Sinusoid,2,458,diurnal_cycle
+219,89.1,9,18,62,Diurnal Sinusoid,2,459,diurnal_cycle
+220,93.91,9,19,66,Diurnal Sinusoid,2,460,diurnal_cycle
+221,90.18,9,18,63,Diurnal Sinusoid,2,461,diurnal_cycle
+222,87.29,9,17,61,Diurnal Sinusoid,2,462,diurnal_cycle
+223,94.48,9,19,66,Diurnal Sinusoid,2,463,diurnal_cycle
+224,103.74,10,21,73,Diurnal Sinusoid,2,464,diurnal_cycle
+225,103.22,10,21,72,Diurnal Sinusoid,2,465,diurnal_cycle
+226,96.15,10,19,67,Diurnal Sinusoid,2,466,diurnal_cycle
+227,106.48,11,21,75,Diurnal Sinusoid,2,467,diurnal_cycle
+228,114.87,11,23,80,Diurnal Sinusoid,2,468,diurnal_cycle
+229,120.47,12,24,84,Diurnal Sinusoid,2,469,diurnal_cycle
+230,116.92,12,23,82,Diurnal Sinusoid,2,470,diurnal_cycle
+231,118.64,12,24,83,Diurnal Sinusoid,2,471,diurnal_cycle
+232,115.19,12,23,81,Diurnal Sinusoid,2,472,diurnal_cycle
+233,119.54,12,24,84,Diurnal Sinusoid,2,473,diurnal_cycle
+234,125.87,13,25,88,Diurnal Sinusoid,2,474,diurnal_cycle
+235,130.48,13,26,91,Diurnal Sinusoid,2,475,diurnal_cycle
+236,133.58,13,27,94,Diurnal Sinusoid,2,476,diurnal_cycle
+237,132.15,13,26,93,Diurnal Sinusoid,2,477,diurnal_cycle
+238,132.27,13,26,93,Diurnal Sinusoid,2,478,diurnal_cycle
+239,136.57,14,27,96,Diurnal Sinusoid,2,479,diurnal_cycle
+0,29.5,3,6,21,Linear Growth Ramp,1,480,linear_ramp
+1,30.48,3,6,21,Linear Growth Ramp,1,481,linear_ramp
+2,31.79,3,6,22,Linear Growth Ramp,1,482,linear_ramp
+3,35.72,4,7,25,Linear Growth Ramp,1,483,linear_ramp
+4,33.9,3,7,24,Linear Growth Ramp,1,484,linear_ramp
+5,30.2,3,6,21,Linear Growth Ramp,1,485,linear_ramp
+6,37.69,4,8,26,Linear Growth Ramp,1,486,linear_ramp
+7,36.68,4,7,26,Linear Growth Ramp,1,487,linear_ramp
+8,37.94,4,8,27,Linear Growth Ramp,1,488,linear_ramp
+9,40.2,4,8,28,Linear Growth Ramp,1,489,linear_ramp
+10,41.69,4,8,29,Linear Growth Ramp,1,490,linear_ramp
+11,46.04,5,9,32,Linear Growth Ramp,1,491,linear_ramp
+12,45.35,5,9,32,Linear Growth Ramp,1,492,linear_ramp
+13,44.53,4,9,31,Linear Growth Ramp,1,493,linear_ramp
+14,42.65,4,9,30,Linear Growth Ramp,1,494,linear_ramp
+15,42.77,4,9,30,Linear Growth Ramp,1,495,linear_ramp
+16,48.27,5,10,34,Linear Growth Ramp,1,496,linear_ramp
+17,53.08,5,11,37,Linear Growth Ramp,1,497,linear_ramp
+18,49.73,5,10,35,Linear Growth Ramp,1,498,linear_ramp
+19,50.3,5,10,35,Linear Growth Ramp,1,499,linear_ramp
+20,53.62,5,11,38,Linear Growth Ramp,1,500,linear_ramp
+21,47.76,5,10,33,Linear Growth Ramp,1,501,linear_ramp
+22,52.84,5,11,37,Linear Growth Ramp,1,502,linear_ramp
+23,56.74,6,11,40,Linear Growth Ramp,1,503,linear_ramp
+24,59.17,6,12,41,Linear Growth Ramp,1,504,linear_ramp
+25,56.35,6,11,39,Linear Growth Ramp,1,505,linear_ramp
+26,59.6,6,12,42,Linear Growth Ramp,1,506,linear_ramp
+27,60.24,6,12,42,Linear Growth Ramp,1,507,linear_ramp
+28,63.2,6,13,44,Linear Growth Ramp,1,508,linear_ramp
+29,57.65,6,12,40,Linear Growth Ramp,1,509,linear_ramp
+30,64.62,6,13,45,Linear Growth Ramp,1,510,linear_ramp
+31,58.42,6,12,41,Linear Growth Ramp,1,511,linear_ramp
+32,55.64,6,11,39,Linear Growth Ramp,1,512,linear_ramp
+33,63.78,6,13,45,Linear Growth Ramp,1,513,linear_ramp
+34,63.78,6,13,45,Linear Growth Ramp,1,514,linear_ramp
+35,71.14,7,14,50,Linear Growth Ramp,1,515,linear_ramp
+36,71.49,7,14,50,Linear Growth Ramp,1,516,linear_ramp
+37,65.98,7,13,46,Linear Growth Ramp,1,517,linear_ramp
+38,74.3,7,15,52,Linear Growth Ramp,1,518,linear_ramp
+39,68.92,7,14,48,Linear Growth Ramp,1,519,linear_ramp
+40,73.21,7,15,51,Linear Growth Ramp,1,520,linear_ramp
+41,73.57,7,15,51,Linear Growth Ramp,1,521,linear_ramp
+42,76.09,8,15,53,Linear Growth Ramp,1,522,linear_ramp
+43,79.64,8,16,56,Linear Growth Ramp,1,523,linear_ramp
+44,80.1,8,16,56,Linear Growth Ramp,2,524,linear_ramp
+45,80.18,8,16,56,Linear Growth Ramp,2,525,linear_ramp
+46,82.32,8,16,58,Linear Growth Ramp,2,526,linear_ramp
+47,82.8,8,17,58,Linear Growth Ramp,2,527,linear_ramp
+48,80.02,8,16,56,Linear Growth Ramp,2,528,linear_ramp
+49,80.79,8,16,57,Linear Growth Ramp,2,529,linear_ramp
+50,82.75,8,17,58,Linear Growth Ramp,2,530,linear_ramp
+51,87.23,9,17,61,Linear Growth Ramp,2,531,linear_ramp
+52,85.69,9,17,60,Linear Growth Ramp,2,532,linear_ramp
+53,95.83,10,19,67,Linear Growth Ramp,2,533,linear_ramp
+54,85.88,9,17,60,Linear Growth Ramp,2,534,linear_ramp
+55,85.99,9,17,60,Linear Growth Ramp,2,535,linear_ramp
+56,93.61,9,19,66,Linear Growth Ramp,2,536,linear_ramp
+57,96.98,10,19,68,Linear Growth Ramp,2,537,linear_ramp
+58,94.87,9,19,66,Linear Growth Ramp,2,538,linear_ramp
+59,97.11,10,19,68,Linear Growth Ramp,2,539,linear_ramp
+60,100.26,10,20,70,Linear Growth Ramp,2,540,linear_ramp
+61,96.03,10,19,67,Linear Growth Ramp,2,541,linear_ramp
+62,92.47,9,18,65,Linear Growth Ramp,2,542,linear_ramp
+63,96.67,10,19,68,Linear Growth Ramp,2,543,linear_ramp
+64,102.96,10,21,72,Linear Growth Ramp,2,544,linear_ramp
+65,95.66,10,19,67,Linear Growth Ramp,2,545,linear_ramp
+66,101.92,10,20,71,Linear Growth Ramp,2,546,linear_ramp
+67,103.77,10,21,73,Linear Growth Ramp,2,547,linear_ramp
+68,102.87,10,21,72,Linear Growth Ramp,2,548,linear_ramp
+69,107.6,11,22,75,Linear Growth Ramp,2,549,linear_ramp
+70,108.18,11,22,76,Linear Growth Ramp,2,550,linear_ramp
+71,115.36,12,23,81,Linear Growth Ramp,2,551,linear_ramp
+72,110.5,11,22,77,Linear Growth Ramp,2,552,linear_ramp
+73,107.28,11,21,75,Linear Growth Ramp,2,553,linear_ramp
+74,108.54,11,22,76,Linear Growth Ramp,2,554,linear_ramp
+75,108.68,11,22,76,Linear Growth Ramp,2,555,linear_ramp
+76,116.01,12,23,81,Linear Growth Ramp,2,556,linear_ramp
+77,111.78,11,22,78,Linear Growth Ramp,2,557,linear_ramp
+78,114.61,11,23,80,Linear Growth Ramp,2,558,linear_ramp
+79,118.56,12,24,83,Linear Growth Ramp,2,559,linear_ramp
+80,114.5,11,23,80,Linear Growth Ramp,2,560,linear_ramp
+81,117.09,12,23,82,Linear Growth Ramp,2,561,linear_ramp
+82,112.76,11,23,79,Linear Growth Ramp,2,562,linear_ramp
+83,116.5,12,23,82,Linear Growth Ramp,2,563,linear_ramp
+84,119.39,12,24,84,Linear Growth Ramp,2,564,linear_ramp
+85,123.92,12,25,87,Linear Growth Ramp,2,565,linear_ramp
+86,127.73,13,26,89,Linear Growth Ramp,2,566,linear_ramp
+87,124.58,12,25,87,Linear Growth Ramp,2,567,linear_ramp
+88,126.65,13,25,89,Linear Growth Ramp,2,568,linear_ramp
+89,127.41,13,25,89,Linear Growth Ramp,2,569,linear_ramp
+90,131.7,13,26,92,Linear Growth Ramp,2,570,linear_ramp
+91,132.12,13,26,92,Linear Growth Ramp,2,571,linear_ramp
+92,131.04,13,26,92,Linear Growth Ramp,2,572,linear_ramp
+93,127.63,13,26,89,Linear Growth Ramp,2,573,linear_ramp
+94,135.42,14,27,95,Linear Growth Ramp,2,574,linear_ramp
+95,134.68,13,27,94,Linear Growth Ramp,2,575,linear_ramp
+96,138.73,14,28,97,Linear Growth Ramp,2,576,linear_ramp
+97,135.42,14,27,95,Linear Growth Ramp,2,577,linear_ramp
+98,143.45,14,29,100,Linear Growth Ramp,2,578,linear_ramp
+99,136.44,14,27,96,Linear Growth Ramp,2,579,linear_ramp
+100,144.36,14,29,101,Linear Growth Ramp,2,580,linear_ramp
+101,140.28,14,28,98,Linear Growth Ramp,2,581,linear_ramp
+102,139.16,14,28,97,Linear Growth Ramp,2,582,linear_ramp
+103,138.1,14,28,97,Linear Growth Ramp,2,583,linear_ramp
+104,142.61,14,29,100,Linear Growth Ramp,2,584,linear_ramp
+105,149.21,15,30,104,Linear Growth Ramp,2,585,linear_ramp
+106,148.17,15,30,104,Linear Growth Ramp,2,586,linear_ramp
+107,148.81,15,30,104,Linear Growth Ramp,2,587,linear_ramp
+108,139.17,14,28,97,Linear Growth Ramp,2,588,linear_ramp
+109,151.07,15,30,106,Linear Growth Ramp,2,589,linear_ramp
+110,151.61,15,30,106,Linear Growth Ramp,2,590,linear_ramp
+111,148.83,15,30,104,Linear Growth Ramp,2,591,linear_ramp
+112,149.65,15,30,105,Linear Growth Ramp,2,592,linear_ramp
+113,152.92,15,31,107,Linear Growth Ramp,2,593,linear_ramp
+114,160.05,16,32,112,Linear Growth Ramp,3,594,linear_ramp
+115,151.41,15,30,106,Linear Growth Ramp,2,595,linear_ramp
+116,154.7,15,31,108,Linear Growth Ramp,2,596,linear_ramp
+117,162.05,16,32,113,Linear Growth Ramp,3,597,linear_ramp
+118,156.81,16,31,110,Linear Growth Ramp,2,598,linear_ramp
+119,158.18,16,32,111,Linear Growth Ramp,2,599,linear_ramp
+120,160.89,16,32,113,Linear Growth Ramp,3,600,linear_ramp
+121,157.29,16,31,110,Linear Growth Ramp,2,601,linear_ramp
+122,163.49,16,33,114,Linear Growth Ramp,3,602,linear_ramp
+123,159.57,16,32,112,Linear Growth Ramp,2,603,linear_ramp
+124,167.99,17,34,118,Linear Growth Ramp,3,604,linear_ramp
+125,165.99,17,33,116,Linear Growth Ramp,3,605,linear_ramp
+126,175.06,18,35,123,Linear Growth Ramp,3,606,linear_ramp
+127,169.14,17,34,118,Linear Growth Ramp,3,607,linear_ramp
+128,174.03,17,35,122,Linear Growth Ramp,3,608,linear_ramp
+129,165.77,17,33,116,Linear Growth Ramp,3,609,linear_ramp
+130,171.0,17,34,120,Linear Growth Ramp,3,610,linear_ramp
+131,173.64,17,35,122,Linear Growth Ramp,3,611,linear_ramp
+132,179.71,18,36,126,Linear Growth Ramp,3,612,linear_ramp
+133,168.8,17,34,118,Linear Growth Ramp,3,613,linear_ramp
+134,179.24,18,36,125,Linear Growth Ramp,3,614,linear_ramp
+135,178.93,18,36,125,Linear Growth Ramp,3,615,linear_ramp
+136,183.32,18,37,128,Linear Growth Ramp,3,616,linear_ramp
+137,181.53,18,36,127,Linear Growth Ramp,3,617,linear_ramp
+138,180.31,18,36,126,Linear Growth Ramp,3,618,linear_ramp
+139,179.39,18,36,126,Linear Growth Ramp,3,619,linear_ramp
+140,177.93,18,36,125,Linear Growth Ramp,3,620,linear_ramp
+141,184.07,18,37,129,Linear Growth Ramp,3,621,linear_ramp
+142,183.81,18,37,129,Linear Growth Ramp,3,622,linear_ramp
+143,192.64,19,39,135,Linear Growth Ramp,3,623,linear_ramp
+144,184.51,18,37,129,Linear Growth Ramp,3,624,linear_ramp
+145,188.86,19,38,132,Linear Growth Ramp,3,625,linear_ramp
+146,183.34,18,37,128,Linear Growth Ramp,3,626,linear_ramp
+147,188.53,19,38,132,Linear Growth Ramp,3,627,linear_ramp
+148,191.92,19,38,134,Linear Growth Ramp,3,628,linear_ramp
+149,194.98,19,39,136,Linear Growth Ramp,3,629,linear_ramp
+150,198.25,20,40,139,Linear Growth Ramp,3,630,linear_ramp
+151,194.11,19,39,136,Linear Growth Ramp,3,631,linear_ramp
+152,191.45,19,38,134,Linear Growth Ramp,3,632,linear_ramp
+153,198.05,20,40,139,Linear Growth Ramp,3,633,linear_ramp
+154,199.34,20,40,140,Linear Growth Ramp,3,634,linear_ramp
+155,200.34,20,40,140,Linear Growth Ramp,3,635,linear_ramp
+156,197.26,20,39,138,Linear Growth Ramp,3,636,linear_ramp
+157,204.76,20,41,143,Linear Growth Ramp,3,637,linear_ramp
+158,202.19,20,40,142,Linear Growth Ramp,3,638,linear_ramp
+159,205.42,21,41,144,Linear Growth Ramp,3,639,linear_ramp
+160,208.52,21,42,146,Linear Growth Ramp,3,640,linear_ramp
+161,207.28,21,41,145,Linear Growth Ramp,3,641,linear_ramp
+162,207.24,21,41,145,Linear Growth Ramp,3,642,linear_ramp
+163,214.86,21,43,150,Linear Growth Ramp,3,643,linear_ramp
+164,209.26,21,42,146,Linear Growth Ramp,3,644,linear_ramp
+165,208.46,21,42,146,Linear Growth Ramp,3,645,linear_ramp
+166,210.98,21,42,148,Linear Growth Ramp,3,646,linear_ramp
+167,216.86,22,43,152,Linear Growth Ramp,3,647,linear_ramp
+168,213.18,21,43,149,Linear Growth Ramp,3,648,linear_ramp
+169,215.67,22,43,151,Linear Growth Ramp,3,649,linear_ramp
+170,219.12,22,44,153,Linear Growth Ramp,3,650,linear_ramp
+171,214.23,21,43,150,Linear Growth Ramp,3,651,linear_ramp
+172,211.07,21,42,148,Linear Growth Ramp,3,652,linear_ramp
+173,219.25,22,44,153,Linear Growth Ramp,3,653,linear_ramp
+174,220.09,22,44,154,Linear Growth Ramp,3,654,linear_ramp
+175,218.25,22,44,153,Linear Growth Ramp,3,655,linear_ramp
+176,224.51,22,45,157,Linear Growth Ramp,3,656,linear_ramp
+177,224.68,22,45,157,Linear Growth Ramp,3,657,linear_ramp
+178,220.16,22,44,154,Linear Growth Ramp,3,658,linear_ramp
+179,226.54,23,45,159,Linear Growth Ramp,3,659,linear_ramp
+180,225.13,23,45,158,Linear Growth Ramp,3,660,linear_ramp
+181,221.71,22,44,155,Linear Growth Ramp,3,661,linear_ramp
+182,229.58,23,46,161,Linear Growth Ramp,3,662,linear_ramp
+183,228.92,23,46,160,Linear Growth Ramp,3,663,linear_ramp
+184,227.56,23,46,159,Linear Growth Ramp,3,664,linear_ramp
+185,233.09,23,47,163,Linear Growth Ramp,3,665,linear_ramp
+186,234.05,23,47,164,Linear Growth Ramp,3,666,linear_ramp
+187,231.41,23,46,162,Linear Growth Ramp,3,667,linear_ramp
+188,235.92,24,47,165,Linear Growth Ramp,3,668,linear_ramp
+189,239.16,24,48,167,Linear Growth Ramp,3,669,linear_ramp
+190,234.2,23,47,164,Linear Growth Ramp,3,670,linear_ramp
+191,239.12,24,48,167,Linear Growth Ramp,3,671,linear_ramp
+192,238.88,24,48,167,Linear Growth Ramp,3,672,linear_ramp
+193,247.89,25,50,174,Linear Growth Ramp,4,673,linear_ramp
+194,234.53,23,47,164,Linear Growth Ramp,3,674,linear_ramp
+195,244.57,24,49,171,Linear Growth Ramp,4,675,linear_ramp
+196,242.15,24,48,170,Linear Growth Ramp,4,676,linear_ramp
+197,243.96,24,49,171,Linear Growth Ramp,4,677,linear_ramp
+198,252.05,25,50,176,Linear Growth Ramp,4,678,linear_ramp
+199,246.46,25,49,173,Linear Growth Ramp,4,679,linear_ramp
+200,255.42,26,51,179,Linear Growth Ramp,4,680,linear_ramp
+201,247.11,25,49,173,Linear Growth Ramp,4,681,linear_ramp
+202,250.98,25,50,176,Linear Growth Ramp,4,682,linear_ramp
+203,249.12,25,50,174,Linear Growth Ramp,4,683,linear_ramp
+204,249.51,25,50,175,Linear Growth Ramp,4,684,linear_ramp
+205,253.23,25,51,177,Linear Growth Ramp,4,685,linear_ramp
+206,253.11,25,51,177,Linear Growth Ramp,4,686,linear_ramp
+207,255.9,26,51,179,Linear Growth Ramp,4,687,linear_ramp
+208,248.91,25,50,174,Linear Growth Ramp,4,688,linear_ramp
+209,264.37,26,53,185,Linear Growth Ramp,4,689,linear_ramp
+210,257.87,26,52,181,Linear Growth Ramp,4,690,linear_ramp
+211,265.64,27,53,186,Linear Growth Ramp,4,691,linear_ramp
+212,257.1,26,51,180,Linear Growth Ramp,4,692,linear_ramp
+213,262.74,26,53,184,Linear Growth Ramp,4,693,linear_ramp
+214,273.88,27,55,192,Linear Growth Ramp,4,694,linear_ramp
+215,260.85,26,52,183,Linear Growth Ramp,4,695,linear_ramp
+216,259.75,26,52,182,Linear Growth Ramp,4,696,linear_ramp
+217,264.15,26,53,185,Linear Growth Ramp,4,697,linear_ramp
+218,268.81,27,54,188,Linear Growth Ramp,4,698,linear_ramp
+219,270.67,27,54,189,Linear Growth Ramp,4,699,linear_ramp
+220,273.85,27,55,192,Linear Growth Ramp,4,700,linear_ramp
+221,269.52,27,54,189,Linear Growth Ramp,4,701,linear_ramp
+222,265.9,27,53,186,Linear Growth Ramp,4,702,linear_ramp
+223,271.07,27,54,190,Linear Growth Ramp,4,703,linear_ramp
+224,278.02,28,56,195,Linear Growth Ramp,4,704,linear_ramp
+225,276.4,28,55,193,Linear Growth Ramp,4,705,linear_ramp
+226,269.01,27,54,188,Linear Growth Ramp,4,706,linear_ramp
+227,276.82,28,55,194,Linear Growth Ramp,4,707,linear_ramp
+228,282.93,28,57,198,Linear Growth Ramp,4,708,linear_ramp
+229,286.56,29,57,201,Linear Growth Ramp,4,709,linear_ramp
+230,282.18,28,56,198,Linear Growth Ramp,4,710,linear_ramp
+231,282.38,28,56,198,Linear Growth Ramp,4,711,linear_ramp
+232,278.04,28,56,195,Linear Growth Ramp,4,712,linear_ramp
+233,280.52,28,56,196,Linear Growth Ramp,4,713,linear_ramp
+234,284.72,28,57,199,Linear Growth Ramp,4,714,linear_ramp
+235,287.41,29,57,201,Linear Growth Ramp,4,715,linear_ramp
+236,288.77,29,58,202,Linear Growth Ramp,4,716,linear_ramp
+237,286.15,29,57,200,Linear Growth Ramp,4,717,linear_ramp
+238,284.88,28,57,199,Linear Growth Ramp,4,718,linear_ramp
+239,287.28,29,57,201,Linear Growth Ramp,4,719,linear_ramp
