@@ -369,14 +369,14 @@ function updateAllVisuals(tick) {
   el.urllcLat.textContent = m.urllc_lat.toFixed(2);
   el.urllcP99.textContent = `p99: ${summary.urllc.p99} ms`;
   if (m.urllc_lat < 5.0) {
-    el.urllcSlaBadge.textContent = 'Target < 5.0 ms ✓';
+    el.urllcSlaBadge.textContent = 'Target < 5.0 ms [OK]';
     el.urllcSlaBadge.style.color = 'var(--urllc)';
     el.slaPill.textContent = 'URLLC PROTECTED';
     el.slaPill.className = 'chart-badge';
   } else {
-    el.urllcSlaBadge.textContent = 'SLA VIOLATION ✗';
-    el.urllcSlaBadge.style.color = 'var(--danger)';
-    el.slaPill.textContent = 'SLA VIOLATION';
+    el.urllcSlaBadge.textContent = 'SLA Exceeded (> 5.0 ms)';
+    el.urllcSlaBadge.style.color = 'var(--warning, #f59e0b)';
+    el.slaPill.textContent = 'SLA EXCEEDED';
     el.slaPill.className = 'chart-badge amber';
   }
 
@@ -513,7 +513,7 @@ function initCharts() {
       labels: [],
       datasets: [
         { label: 'Cluster CPU (%)', data: [], borderColor: '#38bdf8', borderWidth: 2, pointRadius: 0, yAxisID: 'y' },
-        { label: 'Queue Backlog (req)', data: [], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.2)', fill: true, borderWidth: 1, pointRadius: 0, yAxisID: 'y1' }
+        { label: 'Queue Backlog (req)', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.15)', fill: true, borderWidth: 1, pointRadius: 0, yAxisID: 'y1' }
       ]
     },
     options: {
@@ -521,7 +521,7 @@ function initCharts() {
       scales: {
         x: commonOptions.scales.x,
         y: { ...commonOptions.scales.y, max: 100, title: { display: true, text: 'CPU %', color: '#64748b' } },
-        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#ef4444' }, title: { display: true, text: 'Backlog', color: '#ef4444' } }
+        y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#f59e0b' }, title: { display: true, text: 'Backlog', color: '#f59e0b' } }
       }
     }
   });
@@ -649,13 +649,13 @@ function initCanvas() {
     ctx.fillStyle = '#a855f7';
     ctx.font = '10px Inter';
     ctx.textAlign = 'left';
-    ctx.fillText('⚡ URLLC Fast Lane (0ms Bypass)', lbX - 82, pqY + 18);
+    ctx.fillText('URLLC Fast Lane (0ms Bypass)', lbX - 82, pqY + 18);
     
     ctx.fillStyle = '#06b6d4';
-    ctx.fillText('⏱ eMBB FIFO Queue', lbX - 82, pqY + 38);
+    ctx.fillText('eMBB FIFO Queue', lbX - 82, pqY + 38);
     
     ctx.fillStyle = '#f59e0b';
-    ctx.fillText('🔒 mMTC Token Bucket (>80% Throttled)', lbX - 82, pqY + 58);
+    ctx.fillText('mMTC Token Bucket (>80% Throttled)', lbX - 82, pqY + 58);
 
     // Forecaster & Dispatcher
     drawSubBox(ctx, lbX - 90, 220, 180, 32, '2. LSTM Forecaster (H=45s)', '#38bdf8');
@@ -663,8 +663,7 @@ function initCanvas() {
 
     // 3. Draw AMF Instances Pool
     const amfs = state.amfCards.length > 0 ? state.amfCards : [
-      { id: 'AMF-1', state: 'ACTIVE', cpu: 65 },
-      { id: 'AMF-2', state: 'ACTIVE', cpu: 70 }
+      { id: 'AMF-1', state: 'ACTIVE', cpu: 30 }
     ];
     const totalAmfs = amfs.length;
     const spacing = Math.min(65, 280 / Math.max(1, totalAmfs));
@@ -937,7 +936,7 @@ function renderExperimentView(expId, data) {
     items.forEach(k => {
       const row = data.data[k];
       const isProt = row['URLLC Protected'].includes('YES');
-      html += `<tr><td><strong>${k}</strong></td><td style="color:${isProt?'#10b981':'#ef4444'}">${row['URLLC p99 (ms)']} ms</td><td>${row['mMTC p99 (ms)']} ms</td><td>${row['Cold Start Lag (s)']}s</td><td style="color:${isProt?'#10b981':'#ef4444'};font-weight:700">${row['URLLC Protected']}</td></tr>`;
+      html += `<tr><td><strong>${k}</strong></td><td style="color:${isProt?'#10b981':'#94a3b8'}">${row['URLLC p99 (ms)']} ms</td><td>${row['mMTC p99 (ms)']} ms</td><td>${row['Cold Start Lag (s)']}s</td><td style="color:${isProt?'#10b981':'#94a3b8'};font-weight:600">${row['URLLC Protected']}</td></tr>`;
     });
     html += `</tbody></table>`;
     el.expTableContainer.innerHTML = html;
@@ -950,7 +949,7 @@ function renderExperimentView(expId, data) {
       data: {
         labels: rows.map(r => r.configuration),
         datasets: [
-          { label: 'Cold Start Lag (s)', data: rows.map(r => r.cold_start_lag_s), backgroundColor: '#ef4444' },
+          { label: 'Cold Start Lag (s)', data: rows.map(r => r.cold_start_lag_s), backgroundColor: '#64748b' },
           { label: 'URLLC Mean Latency (ms)', data: rows.map(r => r.urllc_mean_ms), backgroundColor: '#a855f7' }
         ]
       },

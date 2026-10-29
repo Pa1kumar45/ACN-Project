@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>5G Core SmartLB — Predictive & Slice-Aware AMF Autoscaling</title>
-  <!-- Google Fonts -->
+  <title>5G Core AMF Auto-Scaling &amp; Load Balancing Dashboard</title>
+  <!-- Clean Academic Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
@@ -16,37 +16,29 @@
   <!-- Top Navigation Bar -->
   <nav class="navbar">
     <div class="nav-left">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-        </svg>
-      </div>
       <div class="brand">
-        <span class="brand-title">5G Core SmartLB</span>
-        <span class="brand-badge">NITK Surathkal</span>
+        <span class="brand-title">5G Core AMF SmartLB</span>
+        <span class="brand-badge">SBA Control Plane</span>
       </div>
     </div>
 
     <!-- Multi-Page Tabs -->
     <div class="nav-tabs">
       <button class="nav-tab active" id="tab-btn-live" data-tab="live" onclick="switchTab('live')">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        Live Slices & Processing
+        Live Slices &amp; Simulation
       </button>
       <button class="nav-tab" id="tab-btn-fleet" data-tab="fleet" onclick="switchTab('fleet')">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-        Container Fleet
+        AMF Container Fleet
       </button>
       <button class="nav-tab" id="tab-btn-benchmarks" data-tab="benchmarks" onclick="switchTab('benchmarks')">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-        Model Benchmarks
+        Forecasting Benchmarks
       </button>
     </div>
 
     <div class="nav-right">
       <div class="status-indicator online">
         <span class="status-dot"></span>
-        <span class="status-text">Socket :8383 Online</span>
+        <span class="status-text" id="engine-status">Simulation Engine Active</span>
       </div>
     </div>
   </nav>
@@ -54,37 +46,36 @@
   <!-- Main Multi-Page Container -->
   <main class="page-container">
 
-    <!-- ================= PAGE 1: LIVE SLICES & PROCESSING ================= -->
+    <!-- ================= PAGE 1: LIVE SLICES & SIMULATION ================= -->
     <section id="page-live" class="tab-page active">
-      <!-- Minimalist Control Strip -->
+      <!-- Control Strip -->
       <div class="control-strip card">
         <!-- Trace Selector -->
         <div class="control-item">
-          <label>Workload Trace</label>
+          <label>Workload Dataset</label>
           <select id="select-dataset" class="select-input">
-            <option value="flash_crowd_surge.csv">Flash Crowd IoT Storm (ScaleLB Fig 5)</option>
+            <option value="flash_crowd_surge.csv">Flash Crowd IoT Surge (ScaleLB Fig 5)</option>
             <option value="diurnal_cycle.csv">Diurnal Cellular Cycle</option>
-            <option value="linear_ramp.csv">Linear Traffic Ramp</option>
+            <option value="linear_ramp.csv">Linear Growth Ramp</option>
           </select>
         </div>
 
         <!-- Mode Toggle -->
         <div class="control-item">
-          <label>Architecture</label>
+          <label>Operating Policy</label>
           <div class="pill-toggle">
-            <button class="toggle-btn active" id="btn-mode-proposed">⚡ Proposed (Priority Q)</button>
-            <button class="toggle-btn" id="btn-mode-baseline">⚠️ Baseline (Single FIFO)</button>
-            <button class="toggle-btn" id="btn-mode-compare">📊 Compare Overlay</button>
+            <button class="toggle-btn active" id="btn-mode-proposed">Proposed (LSTM + Slicing)</button>
+            <button class="toggle-btn" id="btn-mode-baseline">Baseline (ScaleLB FIFO)</button>
+            <button class="toggle-btn" id="btn-mode-compare">Comparison Overlay</button>
           </div>
         </div>
 
         <!-- Playback Controls -->
         <div class="control-item playback-item">
-          <label>Simulation Playback</label>
+          <label>Timeline Execution</label>
           <div class="playback-controls">
             <button id="btn-play" class="btn btn-primary">
-              <svg id="play-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              <span id="play-label">Play</span>
+              <span id="play-label">Run</span>
             </button>
             <button id="btn-reset" class="btn btn-secondary">Reset</button>
             <div class="speed-selector">
@@ -105,78 +96,96 @@
         </div>
       </div>
 
-      <!-- SLA Notification Bar (Only alerts when important) -->
+      <!-- Architecture Configuration Banner -->
       <div id="sla-alert" class="alert-bar success">
-        <span class="alert-icon" id="alert-icon">🛡️</span>
         <div class="alert-content">
-          <strong id="alert-title">Priority Queue Active:</strong>
-          <span id="alert-msg">URLLC bypasses queue directly (< 5ms SLA respected). mMTC IoT storm is buffered safely.</span>
+          <strong id="alert-title">Policy: Proposed Framework (3GPP S-NSSAI Slicing + LSTM Predictive Scaling)</strong>
+          <span id="alert-msg">URLLC control messages bypass shared ingress queues with non-blocking dispatch (< 5ms SLA). mMTC bursts are buffered and token-bucket throttled when CPU utilization exceeds 80%. LSTM forecasts demand 45s ahead to eliminate container cold-start delay.</span>
         </div>
       </div>
 
-      <!-- Clean 4-Card KPI Strip -->
+      <!-- 4-Card Performance Metric Strip -->
       <div class="kpi-grid">
         <!-- URLLC -->
         <div class="kpi-box urllc-box" id="kpi-urllc-box">
           <div class="kpi-top">
-            <span class="slice-badge urllc">URLLC • Slice 1</span>
-            <span class="sla-target">&lt; 5ms SLA</span>
+            <span class="slice-badge urllc">URLLC - Slice 1</span>
+            <span class="sla-target">&lt; 5.0ms SLA</span>
           </div>
           <div class="kpi-value-row">
-            <span class="kpi-number" id="val-urllc">3.18</span>
+            <span class="kpi-number" id="val-urllc">3.15</span>
             <span class="kpi-unit">ms</span>
           </div>
-          <div class="kpi-foot" id="sub-urllc">Non-blocking Bypass</div>
+          <div class="kpi-foot" id="sub-urllc">Zero-Queue Bypass Guaranteed</div>
         </div>
 
         <!-- eMBB -->
         <div class="kpi-box embb-box">
           <div class="kpi-top">
-            <span class="slice-badge embb">eMBB • Slice 0</span>
-            <span class="sla-target">10–25ms Target</span>
+            <span class="slice-badge embb">eMBB - Slice 0</span>
+            <span class="sla-target">10-25ms Target</span>
           </div>
           <div class="kpi-value-row">
-            <span class="kpi-number" id="val-embb">14.2</span>
+            <span class="kpi-number" id="val-embb">13.5</span>
             <span class="kpi-unit">ms</span>
           </div>
-          <div class="kpi-foot">Broadband FIFO Queue</div>
+          <div class="kpi-foot">Standard FIFO Queue</div>
         </div>
 
         <!-- mMTC -->
         <div class="kpi-box mmtc-box">
           <div class="kpi-top">
-            <span class="slice-badge mmtc">mMTC • Slice 2</span>
+            <span class="slice-badge mmtc">mMTC - Slice 2</span>
             <span class="sla-target">Delay-Tolerant</span>
           </div>
           <div class="kpi-value-row">
             <span class="kpi-number" id="val-mmtc">24.5</span>
             <span class="kpi-unit">ms</span>
           </div>
-          <div class="kpi-foot">Token Bucket Throttled</div>
+          <div class="kpi-foot">Token-Bucket Rate Limited (>80% CPU)</div>
         </div>
 
         <!-- Active AMFs -->
         <div class="kpi-box fleet-box">
           <div class="kpi-top">
-            <span class="slice-badge amf">Active AMFs</span>
-            <span class="sla-target" id="val-forecast">Lookahead: 35 rps</span>
+            <span class="slice-badge amf">Active AMF Instances</span>
+            <span class="sla-target" id="val-forecast">Lookahead: 35 req/s</span>
           </div>
           <div class="kpi-value-row">
             <span class="kpi-number" id="val-amfs">1</span>
-            <span class="kpi-unit">containers</span>
+            <span class="kpi-unit">AMF Replicas</span>
           </div>
           <div class="kpi-foot" id="sub-amfs">Capacity: 100 req/s</div>
         </div>
       </div>
 
-      <!-- Clean 2-Chart Layout -->
+      <!-- Live 5G AMF Container Pool Visualizer -->
+      <div class="card amf-pool-card">
+        <div class="amf-pool-header">
+          <div class="amf-pool-title-group">
+            <span class="amf-pool-badge">5G Core AMF Cluster</span>
+            <h3>Access &amp; Mobility Management Function (AMF) Container Fleet</h3>
+            <span class="amf-pool-note" id="amf-pool-note">Instance capacity: &mu; = 100 req/s (Ts = 10ms) | Container initialization delay: Tboot = 40.0s</span>
+          </div>
+          <div class="amf-pool-summary" id="amf-pool-summary">
+            <span class="badge-status-active"><span class="dot green"></span> Active: <strong id="summary-active-count">1</strong></span>
+            <span class="badge-status-booting"><span class="dot amber"></span> Booting: <strong id="summary-booting-count">0</strong></span>
+            <span class="badge-status-total">Cluster Capacity: <strong id="summary-capacity">100</strong> req/s</span>
+          </div>
+        </div>
+        <div class="amf-live-grid" id="amf-live-grid">
+          <!-- Dynamically populated with AMF-1 to AMF-6 -->
+        </div>
+      </div>
+
+      <!-- 2-Chart Layout -->
       <div class="charts-grid">
         <!-- Chart 1: Traffic Demand vs LSTM Prediction -->
         <div class="chart-card card">
           <div class="card-header">
             <div>
-              <h3>Traffic Demand & 45s Predictive Scaling</h3>
-              <p class="card-desc">LSTM anticipates the 320 req/s surge 45s early to warm up containers</p>
+              <h3>Traffic Demand &amp; Predictive Capacity Dimensioning</h3>
+              <p class="card-desc">LSTM anticipates surge trajectory 45s ahead (H &ge; Tboot) to pre-provision AMF instances</p>
             </div>
             <div class="view-toggle">
               <button class="chart-btn" id="btn-chart1-stream">Dynamic Stream</button>
@@ -192,8 +201,8 @@
         <div class="chart-card card">
           <div class="card-header">
             <div>
-              <h3>Per-Slice Latency & 3GPP SLA (5ms)</h3>
-              <p class="card-desc">URLLC locked strictly below 5ms vs Baseline bufferhead delay</p>
+              <h3>Control-Plane Latency &amp; 3GPP SLA Verification</h3>
+              <p class="card-desc">URLLC bounded strictly under 5ms vs. Baseline queuing delay under mMTC burst</p>
             </div>
             <div class="view-toggle">
               <span class="legend-badge-purple">URLLC</span>
@@ -213,29 +222,29 @@
       <div class="fleet-summary card">
         <div class="fleet-summary-header">
           <div>
-            <h3>AMF Worker Container Topology</h3>
-            <p class="card-desc">Auto-scaled worker fleet managed by the LSTM Autoscaler daemon</p>
+            <h3>AMF Worker Container Topology &amp; Configuration</h3>
+            <p class="card-desc">Elastic pool of replicated Access and Mobility Management Functions managed by autoscaler</p>
           </div>
           <div class="formula-badge">
-            Scaling Policy: <code>N(t) = ceil( λ̂(t+45) / (μ · γ) )</code>
+            Scaling Rule: N(t) = &lceil; &lambda;&circ;(t+45s)&middot;(1+m) / (&mu;&middot;&gamma;) &rceil;
           </div>
         </div>
         <div class="fleet-metrics-strip">
           <div class="f-metric">
-            <span class="f-lbl">Service Rate (μ)</span>
-            <span class="f-val">100 req/s / worker</span>
+            <span class="f-lbl">Service Rate (&mu;)</span>
+            <span class="f-val">100 req/s / AMF</span>
           </div>
           <div class="f-metric">
-            <span class="f-lbl">Target Utilization (γ)</span>
+            <span class="f-lbl">Target Utilization (&gamma;)</span>
             <span class="f-val">80%</span>
           </div>
           <div class="f-metric">
-            <span class="f-lbl">Cold-Start Delay</span>
-            <span class="f-val">40.0s (AMF Boot)</span>
+            <span class="f-lbl">Container Startup Delay</span>
+            <span class="f-val">40.0s (Tboot)</span>
           </div>
           <div class="f-metric">
-            <span class="f-lbl">LSTM Lookahead (H)</span>
-            <span class="f-val">45.0s (Overcomes Lag)</span>
+            <span class="f-lbl">Prediction Horizon (H)</span>
+            <span class="f-val">45.0s (H &ge; Tboot)</span>
           </div>
         </div>
       </div>
@@ -254,7 +263,7 @@
           <p class="card-desc">Chronological Train (70%) vs Test (30%) split across all synthetic 5G workload traces</p>
         </div>
         <div class="best-model-pill">
-          ★ LSTM Forecaster: Lowest RMSE on Flash Crowd Surges
+          Evaluated Horizon: H = 45s (Window W = 60s)
         </div>
       </div>
 

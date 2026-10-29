@@ -183,4 +183,9 @@ def run_server(port: int = PORT):
         httpd.server_close()
 
 if __name__ == "__main__":
-    run_server(PORT)
+    port = PORT
+    for i, a in enumerate(sys.argv):
+        if a == "--port" and i + 1 < len(sys.argv):
+            try: port = int(sys.argv[i + 1])
+            except ValueError: pass
+    run_server(port)
