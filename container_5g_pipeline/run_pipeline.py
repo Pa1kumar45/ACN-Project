@@ -59,12 +59,18 @@ def main():
     prepare_pipeline_data()
 
     if use_docker:
-        print("[*] Launching microservices with Docker Compose...")
+        print("[*] Checking Docker daemon status...")
         try:
-            subprocess.run("docker compose up -d", cwd=CURRENT_DIR, shell=True, check=True)
-            print("[*] All 5G microservices running in Docker!")
+            chk = subprocess.run(["docker", "info"], capture_output=True, timeout=3)
+            if chk.returncode == 0:
+                print("[*] Launching 5G microservices with Docker Compose (Initial Pool: 1 AMF)...")
+                subprocess.run("docker compose up --scale amf-worker=1 -d --remove-orphans", cwd=CURRENT_DIR, shell=True, check=True)
+                print("[*] All 5G microservices running in Docker (1 base AMF active)!")
+            else:
+                print("[!] Docker daemon is not active. Start it with: sudo systemctl start docker")
+                print("[*] Proceeding with simulation dashboard.")
         except Exception as e:
-            print(f"[!] Docker compose failed ({e}). Proceeding with host dashboard.")
+            print(f"[!] Docker check note: {e}. Proceeding with host dashboard.")
 
     target_port = find_available_port(port)
     url = f"http://localhost:{target_port}/"

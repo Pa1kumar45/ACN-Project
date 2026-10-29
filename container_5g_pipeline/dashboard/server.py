@@ -14,6 +14,9 @@ import os
 import sys
 import json
 import csv
+import time
+import subprocess
+import threading
 import urllib.request
 import urllib.parse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -22,6 +25,70 @@ PORT = int(os.getenv("PORT", "8090"))
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(CURRENT_DIR, "static")
 DATASET_DIR = os.path.join(os.path.dirname(CURRENT_DIR), "dataset")
+DOCKER_PROJECT_DIR = os.path.dirname(CURRENT_DIR)
+
+scale_lock = threading.Lock()
+last_scale_state = {"target": 1, "status": "IDLE", "last_run": 0, "output": ""}
+
+def get_docker_status():
+    """Queries real Docker daemon status and lists active AMF containers."""
+    try:
+        res = subprocess.run(
+            ["docker", "ps", "--filter", "name=amf-worker", "--format", "{{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"],
+            capture_output=True, text=True, timeout=1.8, cwd=DOCKER_PROJECT_DIR
+        )
+        if res.returncode != 0:
+            return {
+                "docker_available": False,
+                "error": res.stderr.strip() or "Docker daemon not responding",
+                "containers": [],
+                "count": 0
+            }
+
+        lines = [line.strip() for line in res.stdout.strip().split("\n") if line.strip()]
+        containers = []
+        for line in lines:
+            parts = line.split("\t")
+            cid = parts[0] if len(parts) > 0 else ""
+            name = parts[1] if len(parts) > 1 else ""
+            status = parts[2] if len(parts) > 2 else ""
+            ports = parts[3] if len(parts) > 3 else ""
+            containers.append({
+                "id": cid,
+                "name": name,
+                "status": status,
+                "ports": ports,
+                "state": "ACTIVE" if "Up" in status else "INITIALIZING"
+            })
+
+        return {
+            "docker_available": True,
+            "containers": containers,
+            "count": len(containers)
+        }
+    except Exception as e:
+        return {
+            "docker_available": False,
+            "error": str(e),
+            "containers": [],
+            "count": 0
+        }
+
+def run_docker_scale(target_n: int):
+    """Executes docker compose scale in a worker thread."""
+    global last_scale_state
+    with scale_lock:
+        last_scale_state["status"] = "SCALING"
+        last_scale_state["target"] = target_n
+        last_scale_state["last_run"] = time.time()
+        try:
+            cmd = ["docker", "compose", "up", "--scale", f"amf-worker={target_n}", "-d", "--no-recreate"]
+            proc = subprocess.run(cmd, cwd=DOCKER_PROJECT_DIR, capture_output=True, text=True, timeout=15)
+            last_scale_state["status"] = "SUCCESS" if proc.returncode == 0 else "ERROR"
+            last_scale_state["output"] = proc.stdout if proc.returncode == 0 else proc.stderr
+        except Exception as e:
+            last_scale_state["status"] = "ERROR"
+            last_scale_state["output"] = str(e)
 
 class DashboardHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -128,6 +195,12 @@ class DashboardHandler(SimpleHTTPRequestHandler):
             })
             return
 
+        elif path == "/api/docker-status":
+            status = get_docker_status()
+            status["scaling_state"] = last_scale_state
+            self._send_json(200, status)
+            return
+
         elif path == "/favicon.ico":
             self.send_response(204)
             self.end_headers()
@@ -138,7 +211,34 @@ class DashboardHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        if path == "/api/config":
+        if path == "/api/scale":
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len).decode("utf-8") if content_len > 0 else "{}"
+            try:
+                data = json.loads(body)
+                target = int(data.get("target_amfs", 1))
+                target = max(1, min(6, target))
+
+                status = get_docker_status()
+                if not status.get("docker_available"):
+                    self._send_json(200, {
+                        "status": "SIMULATION_FALLBACK",
+                        "target_amfs": target,
+                        "message": "Docker daemon inactive; running mathematical simulation."
+                    })
+                    return
+
+                threading.Thread(target=run_docker_scale, args=(target,), daemon=True).start()
+                self._send_json(200, {
+                    "status": "ACCEPTED",
+                    "target_amfs": target,
+                    "message": f"Scaling Docker service 'amf-worker' to {target} instances..."
+                })
+            except Exception as e:
+                self._send_json(400, {"error": str(e)})
+            return
+
+        elif path == "/api/config":
             content_len = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_len) if content_len > 0 else b"{}"
             try:

@@ -11,17 +11,16 @@
 
 ---
 
-## 1. Executive Summary
+## 1. About the Project
 
-In 5G Service-Based Architecture (SBA), the **Access and Mobility Management Function (AMF)** is the primary entry point for control-plane signaling. It terminates the N2 interface from base stations (gNodeBs) and N1 Non-Access Stratum (NAS) signaling from User Equipments (UEs). 
+In 5G Service-Based Architecture (SBA), the **Access and Mobility Management Function (AMF)** handles control-plane signaling (N1 Non-Access Stratum and N2 reference points). Under massive surges of IoT registrations (mMTC flash crowds), conventional setups experience severe performance degradation due to two fundamental architectural bottlenecks:
 
-Under sudden surges of IoT registrations (mMTC flash crowds), AMF processing capacity saturates, triggering severe queue backlogs. Recent state-of-the-art approaches like **ScaleLB** (*Dev et al., IEEE ICOIN 2025*) attempt to solve this via reactive threshold heuristics. However, ScaleLB suffers from two fundamental weaknesses:
-1. **The 40-Second Cold-Start Lag:** Spinning up containerized AMFs requires $T_{\text{boot}} \approx 40\text{ s}$. Because ScaleLB is reactive, queues build up during the 40s boot delay, driving latency to $>330\text{ ms}$.
-2. **Slice-Agnostic Single FIFO Queue:** ScaleLB channels all traffic through a single shared queue. Under an IoT storm, mission-critical Ultra-Reliable Low-Latency Communication (URLLC) packets are trapped behind millions of delay-tolerant sensor packets, severely violating the 3GPP sub-5ms SLA.
+1. **The 40-Second Cold-Start Lag:** Reactive threshold autoscaling (such as *ScaleLB*, IEEE ICOIN 2025) triggers scaling only after servers are already overloaded. New container instances require a 40-second boot delay ($T_{\text{boot}} = 40\text{ s}$), during which incoming requests accumulate in queues and drive latency above 330 ms.
+2. **Head-of-Line Blocking (Single Shared FIFO Queue):** Standard round-robin dispatchers route all slices through a single FIFO buffer. Mission-critical **URLLC** messages are trapped behind millions of delay-tolerant **mMTC** packets, causing massive violations of the 3GPP sub-5ms latency SLA.
 
-This project implements a complete solution to these two challenges:
-* **S-NSSAI Slice-Aware Multi-Tier Priority Queuing (O1):** Non-blocking zero-queue bypass for URLLC signaling ($<5\text{ ms}$ guaranteed) and adaptive token-bucket throttling with aging for mMTC traffic.
-* **LSTM Lookahead Predictive Auto-Scaling (O2):** Deep sequence forecasting with a 45-second prediction horizon ($H = 45\text{ s} \ge T_{\text{boot}} = 40\text{ s}$) that pre-provisions AMFs before traffic arrives, completely eliminating the cold-start delay.
+### Proposed Solution
+* **S-NSSAI Multi-Tier Priority Queuing (O1):** Non-blocking fast-path bypass for URLLC signaling ($< 5\text{ ms}$ guaranteed) combined with adaptive token-bucket rate limiting and aging for mMTC traffic.
+* **LSTM Predictive Auto-Scaling (O2):** Sequence-to-sequence forecaster with a 45-second prediction horizon ($H = 45\text{ s} \ge T_{\text{boot}} = 40\text{ s}$) that pre-provisions AMF container replicas *before* the traffic peak arrives, completely eliminating the cold-start delay.
 
 ---
 
@@ -46,7 +45,7 @@ flowchart TD
     subgraph AMF_POOL["5G Core AMF Container Fleet"]
         AMF1["AMF-1\n(Active, mu = 100 req/s)"]
         AMF2["AMF-2\n(Active, mu = 100 req/s)"]
-        AMF3["AMF-3\n(Pre-Warmed, mu = 100 req/s)"]
+        AMF3["AMF-N\n(Scaled on Demand, mu = 100 req/s)"]
     end
 
     subgraph AUTOSCALER["Predictive Autoscaling Controller"]
@@ -72,103 +71,85 @@ flowchart TD
 
     CL -.->|Telemetry lambda(t)| LSTM
     LSTM --> RULE
-    RULE -.->|Pre-warm Container 45s Ahead| AMF_POOL
+    RULE -.->|Scale AMF Containers 45s Ahead| AMF_POOL
 ```
 
 ---
 
 ## 3. Mathematical Formulation & Core Algorithms
 
-### 3.1. Slice-Aware Priority Queuing (O1)
-Every incoming request carries an S-NSSAI header consisting of Slice/Service Type (SST):
-* **URLLC (SST = 1):** Bypasses shared queue buffers ($W_q = 0\text{ ms}$). Dispatched directly to the lowest-loaded active AMF:
+### 3.1. Slice-Aware Multi-Tier Priority Queuing (O1)
+Every control-plane request carries a 3GPP **S-NSSAI** header with Slice/Service Type (SST):
+* **URLLC (SST = 1):** Bypasses all shared queue buffers ($W_q = 0\text{ ms}$). Dispatched directly to the lowest-loaded active AMF instance:
   $$\text{Target AMF} = \arg\min_{i \in \mathcal{A}_{\text{active}}} \text{CPU}_i(t)$$
-  Active AMFs maintain 10--15% capacity headroom exclusively for URLLC.
-* **eMBB (SST = 0):** Standard FIFO queue for high-throughput mobile traffic.
-* **mMTC (SST = 2):** When cluster CPU utilization exceeds $\gamma = 0.80$, token bucket limits mMTC release rate:
+  Active AMFs reserve a 10--15% capacity headroom exclusively for non-blocking URLLC ingress.
+* **eMBB (SST = 0):** Standard FIFO queue for normal mobile broadband signaling.
+* **mMTC (SST = 2):** When cluster CPU utilization exceeds $\gamma = 0.80$, release rate is throttled by a token bucket:
   $$R_{\text{mMTC}}(t) = \max\Big(0.10 \cdot C(t), \, C(t) \cdot (1 - \text{CPU}(t))\Big)$$
-  To avoid starvation, waiting packets accumulate priority via the aging formula:
+  To avoid indefinite starvation during prolonged surges, packets accumulate priority via dynamic aging:
   $$P_i(t) = P_{\text{base}} + \omega_{\text{age}} \cdot (t - t_{\text{arrive}, i})$$
 
 ### 3.2. LSTM Lookahead Predictive Auto-Scaling (O2)
-* **Observation Window:** Sliding 60-second vector $\mathbf{w}_t = [\lambda(t-59), \dots, \lambda(t)] \in \mathbb{R}^{60}$.
-* **Lookahead Horizon:** $H = 45\text{ s} \ge T_{\text{boot}} = 40\text{ s}$ (ensures newly ordered AMFs finish booting *before* the surge peak arrives).
-* **Target Capacity Formula:**
+* **Observation Window:** Sliding 60-second historical traffic vector $\mathbf{w}_t = [\lambda(t-59), \dots, \lambda(t)] \in \mathbb{R}^{60}$.
+* **Lookahead Condition:** Lookahead horizon $H = 45\text{ s} \ge T_{\text{boot}} = 40\text{ s}$ ensures newly ordered AMF containers finish their boot sequence *before* the traffic surge peak arrives.
+* **Target AMF Dimensioning Formula:**
   $$N^*(t) = \left\lceil \frac{\hat{\lambda}(t + H) \cdot (1 + m)}{\mu \cdot \gamma} \right\rceil$$
   Where:
-  * $\mu = 100\text{ req/s}$ (service capacity per AMF instance)
-  * $\gamma = 0.80$ (target CPU utilization threshold)
-  * $m = 0.10$ (10% safety margin factor)
-* **Scale-In Hysteresis:** 30-second cooldown window to prevent container thrashing, combined with graceful connection draining.
+  * $\hat{\lambda}(t + H)$ = LSTM forecast arrival rate at $t + 45\text{ s}$
+  * $\mu = 100\text{ req/s}$ = AMF service capacity (mean cryptographic auth service time $T_s = 10\text{ ms}$)
+  * $\gamma = 0.80$ = Target CPU utilization threshold (80%)
+  * $m = 0.10$ = Safety margin factor (10%)
+* **Scale-In Hysteresis:** 30-second cooldown window to prevent container thrashing when traffic fluctuates.
 
 ---
 
-## 4. Key Experimental Results
+## 4. Commands to Run
 
-Evaluated against the ScaleLB Figure 5 flash crowd surge ($35 \to 320\text{ req/s}$, 10% URLLC, 20% eMBB, 70% mMTC):
-
-| Scaling Configuration | Cold-Start Lag (s) | URLLC p99 Latency (ms) | mMTC p99 Latency (ms) | URLLC SLA (< 5.0ms) | AMF-seconds (Resource Cost) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **ScaleLB Reactive** *(ICOIN 2025)* | 54 s | 338.7 ms | 339.3 ms | **FAIL (25.8% violation)** | 647 |
-| **ScaleLB Proactive** *($\gamma = 0.80$)* | 55 s | 334.1 ms | 336.5 ms | **FAIL (25.8% violation)** | 649 |
-| **Warm Standby** *(1 permanent spare)* | 0 s | 32.9 ms | 32.7 ms | **PASS** | 1024 |
-| **O1 Only:** Slice Priority Queue | 54 s | 11.1 ms | 508.6 ms | **PASS** | 647 |
-| **O2 Only:** LSTM Prediction | 40 s | 333.1 ms | 336.5 ms | **FAIL (18.3% violation)** | 807 |
-| **Proposed Full System (O1 + O2)** | **0 s** | **3.15 ms** | **499.9 ms** | **PASS (0.0% violation)** | **807** |
-
-### Key Takeaways:
-1. **Cold-Start Elimination:** LSTM pre-warming eliminates the 54-second overload period of ScaleLB.
-2. **URLLC Protection:** Priority queuing guarantees URLLC latency of **3.15 ms**, fully compliant with 3GPP standards.
-3. **Resource Efficiency:** The proposed system uses **21.2% fewer AMF-seconds** than Warm Standby (807 vs 1024 AMF-s).
-
----
-
-## 5. Repository Structure & Deliverables
-
-```
-├── ACN_Final_Report.tex         # Complete Final Report in IEEE Conference format (LaTeX)
-├── presentation.tex             # 14-Slide End Presentation in LaTeX Beamer
-├── presentation.pdf             # Compiled LaTeX Beamer Presentation PDF
-├── figures/                     # Vector diagrams and platform screenshots
-│   ├── platform_dashboard.png   # Real-time traffic demand & LSTM lookahead dashboard
-│   ├── amf_container_fleet.png  # AMF worker container fleet lifecycle visualizer
-│   └── latency_isolation.png    # Per-slice latency isolation and 3GPP SLA verification
-├── run_midreport_comparison.py  # Standalone terminal verification script (zero dependencies)
-├── container_5g_pipeline/       # Production microservice & interactive dashboard
-│   ├── dashboard/               # Clean academic web interface (port 8090)
-│   ├── dataset/                 # 5G traffic traces (flash crowd, diurnal, linear ramp)
-│   ├── services/                # AMF worker, load balancer, autoscaler, traffic replayer
-│   ├── docker-compose.yml       # Docker Compose orchestration
-│   └── run_pipeline.py          # Dashboard launcher script
-└── README.md                    # Master documentation
-```
-
----
-
-## 6. How to Build & Run
-
-### A. Compile the LaTeX Report (IEEE Conference Format)
-You can compile locally with `pdflatex` or upload [`ACN_Final_Report.tex`](file:///home/dinesh/Desktop/course_projects/ACN_project/ACN-Project/ACN_Final_Report.tex) directly to [Overleaf](https://www.overleaf.com):
-```bash
-pdflatex ACN_Final_Report.tex
-```
-
-### B. Compile the LaTeX Beamer Presentation
-Compile the 14-slide presentation deck directly:
-```bash
-pdflatex presentation.tex
-```
-The output is saved as [`presentation.pdf`](file:///home/dinesh/Desktop/course_projects/ACN_project/ACN-Project/presentation.pdf).
-
-### C. Run the Interactive Web Dashboard
-Run the dashboard server with zero external dependencies:
+### A. Run the Interactive Web Dashboard (Simulation Mode)
+Launches the full interactive web dashboard with zero external dependencies (no Docker required):
 ```bash
 python container_5g_pipeline/run_pipeline.py
 ```
-Open **`http://localhost:8090`** in your browser to inspect the real-time dataset replay, 45-second LSTM lookahead, and live AMF container scaling.
+* Opens automatically in your browser at **`http://localhost:8090`**.
+* Interactive trace replay across 3 workload patterns: Flash Crowd Surge, Diurnal Cycle, Linear Ramp.
+* Policy toggles: **Proposed (LSTM + Slicing)**, **Baseline (ScaleLB FIFO)**, and **Comparison Overlay**.
+* Live per-slice latency curves (URLLC, eMBB, mMTC) and AMF container fleet lifecycle cards.
 
-### D. Run the Benchmark Verification Script
-Execute the terminal benchmark across all 6 configurations and all 3 traffic traces:
+---
+
+### B. Run with Live Docker Containers
+To dynamically spawn and scale real Linux containers visible in `docker ps`:
+```bash
+# 1. Start the Docker service on your machine
+sudo systemctl start docker
+
+# 2. Launch the pipeline with Docker integration enabled
+python container_5g_pipeline/run_pipeline.py --docker
+```
+* Starts with 1 base AMF worker container (`amf-worker-1`).
+* Click **Run** on the dashboard: as the surge approaches ($t \approx 30\text{s}$), the LSTM forecaster anticipates load 45s ahead and scales Docker to `amf-worker-2`, `3`, `4`, `5`.
+* Run `docker ps` in another terminal to watch the containers actively spin up in real time.
+* Click **Reset** on the dashboard to scale back to 1 AMF container.
+
+---
+
+### C. Run the Terminal Benchmark
+Executes a standalone benchmark comparing ScaleLB Baseline vs Proposed Framework across all 3 traffic traces:
 ```bash
 python run_midreport_comparison.py
 ```
+
+---
+
+## 5. Key Performance Summary
+
+Evaluated on the ScaleLB Figure 5 flash crowd surge ($35 \to 320\text{ req/s}$):
+
+| Metric | ScaleLB Baseline (Reactive + FIFO) | Proposed Framework (O1 + O2) | 3GPP Target |
+| :--- | :---: | :---: | :---: |
+| **URLLC p99 Latency** | **338.7 ms (Queue Overload)** | **3.40 ms** | **< 5.0 ms (SLA PASS)** |
+| **eMBB Mean Latency** | 119.8 ms | **11.35 ms** | Sub-20 ms |
+| **mMTC Mean Latency** | 125.1 ms | **14.00 ms** | Delay Tolerant |
+| **Container Cold-Start Lag** | 54 seconds | **0 seconds (Pre-Warmed)** | 0 s |
+| **3GPP sub-5ms SLA Verdict** | **FAIL (25.8% Violation)** | **PASS (100% Compliant)** | PASS |
+

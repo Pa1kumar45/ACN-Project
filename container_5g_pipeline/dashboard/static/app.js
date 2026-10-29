@@ -24,7 +24,7 @@ let replayTimer = null;
 
 // Current Modes
 let currentMode = 'PROPOSED'; // 'PROPOSED' | 'BASELINE' | 'COMPARE'
-let plotMode = 'full';         // 'full' (entire trace) | 'stream' (step-by-step playback)
+let plotMode = 'stream';       // 'stream' (step-by-step playback at t=0s) | 'full' (entire trace)
 
 // 5G System Parameters (matching 3GPP TS 23.501 & ScaleLB ICOIN 2025)
 const AMF_MU = 100.0;         // Processing capacity per AMF instance (100 req/s, Ts = 10ms)
@@ -35,13 +35,109 @@ const T_BOOT = 40;            // Container boot initialization delay (40 seconds
 const HORIZON = 45;           // LSTM predictive lookahead horizon (45 seconds)
 const MAX_AMFS = 6;           // Cluster ceiling: 6 AMF container replicas
 
+// Docker Engine Integration State
+let dockerAvailable = false;
+let realDockerContainers = [];
+let lastDockerScaleAmfs = 0;
+let lastDockerScaleTime = 0;
+
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initCharts();
   initControls();
   loadDataset('flash_crowd_surge.csv');
   loadBenchmarks();
+  checkDockerStatus();
+  setInterval(checkDockerStatus, 3500);
+  syncRealDockerContainers(1, true); // Initialize Docker fleet to 1 baseline AMF
 });
+
+/* ================= DOCKER ENGINE INTEGRATION ================= */
+async function checkDockerStatus() {
+  try {
+    const res = await fetch('/api/docker-status');
+    const data = await res.json();
+    dockerAvailable = !!data.docker_available;
+    realDockerContainers = data.containers || [];
+
+    const indicator = document.getElementById('docker-indicator');
+    const statusText = document.getElementById('docker-status-text');
+    const dot = document.getElementById('docker-dot');
+
+    if (indicator && statusText) {
+      if (dockerAvailable) {
+        indicator.className = 'status-indicator online';
+        if (dot) dot.style.background = '#10b981';
+        statusText.textContent = `Docker: Connected (${data.count} AMFs)`;
+      } else {
+        indicator.className = 'status-indicator standby';
+        if (dot) dot.style.background = '#64748b';
+        statusText.textContent = 'Docker: Standby (Sim Mode)';
+      }
+    }
+
+    renderRealDockerBanner(data);
+  } catch (err) {
+    const indicator = document.getElementById('docker-indicator');
+    const statusText = document.getElementById('docker-status-text');
+    if (indicator && statusText) {
+      indicator.className = 'status-indicator standby';
+      statusText.textContent = 'Docker: Standby (Sim Mode)';
+    }
+  }
+}
+
+function renderRealDockerBanner(data) {
+  const banner = document.getElementById('live-docker-banner');
+  const countBadge = document.getElementById('docker-count-badge');
+  const list = document.getElementById('docker-containers-list');
+  if (!banner || !list) return;
+
+  if (data.docker_available && data.containers && data.containers.length > 0) {
+    banner.style.display = 'block';
+    if (countBadge) countBadge.textContent = `${data.count} Live Container${data.count > 1 ? 's' : ''}`;
+    let html = '<div style="display:flex; flex-direction:column; gap:0.4rem;">';
+    for (const c of data.containers) {
+      html += `
+        <div style="background:rgba(255,255,255,0.03); padding:0.4rem 0.6rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.06);">
+          <span><strong>${c.name}</strong> [${c.id.substring(0, 10)}]</span>
+          <span style="color:#10b981; font-weight:600;">${c.status}</span>
+        </div>`;
+    }
+    html += '</div>';
+    list.innerHTML = html;
+  } else if (data.docker_available) {
+    banner.style.display = 'block';
+    if (countBadge) countBadge.textContent = '0 Live Containers';
+    list.innerHTML = '<span style="color:#94a3b8;">Docker connected. No amf-worker containers currently running. Click Run or step timeline to spawn.</span>';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+async function syncRealDockerContainers(targetAmfs, force = false) {
+  // Only trigger real Docker scale if replay is actively running, or on explicit force (e.g. init/reset)
+  if (!isReplaying && !force) return;
+  if (targetAmfs === lastDockerScaleAmfs && !force) return;
+  const now = Date.now();
+  if (!force && now - lastDockerScaleTime < 1800) return; // Debounce rapid scale calls
+  lastDockerScaleAmfs = targetAmfs;
+  lastDockerScaleTime = now;
+
+  try {
+    const res = await fetch('/api/scale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target_amfs: targetAmfs })
+    });
+    const data = await res.json();
+    if (data.status === 'ACCEPTED') {
+      setTimeout(checkDockerStatus, 1500);
+    }
+  } catch (err) {
+    // Graceful silent fallback
+  }
+}
 
 /* ================= 1. TAB NAVIGATION ================= */
 function switchTab(target) {
@@ -84,12 +180,16 @@ function initTabs() {
 
 /* ================= 2. CONTROLS INITIALIZATION ================= */
 function initControls() {
-  document.getElementById('select-dataset').addEventListener('change', (e) => {
-    loadDataset(e.target.value);
-  });
+  const selectDataset = document.getElementById('select-dataset');
+  if (selectDataset) {
+    selectDataset.addEventListener('change', (e) => loadDataset(e.target.value));
+  }
 
-  document.getElementById('btn-play').addEventListener('click', toggleReplay);
-  document.getElementById('btn-reset').addEventListener('click', resetReplay);
+  const btnPlay = document.getElementById('btn-play');
+  if (btnPlay) btnPlay.addEventListener('click', toggleReplay);
+
+  const btnReset = document.getElementById('btn-reset');
+  if (btnReset) btnReset.addEventListener('click', resetReplay);
 
   document.querySelectorAll('.speed-selector .sp-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -99,36 +199,44 @@ function initControls() {
     });
   });
 
-  document.getElementById('btn-mode-proposed').addEventListener('click', () => setArchitectureMode('PROPOSED'));
-  document.getElementById('btn-mode-baseline').addEventListener('click', () => setArchitectureMode('BASELINE'));
-  document.getElementById('btn-mode-compare').addEventListener('click', () => setArchitectureMode('COMPARE'));
+  const btnProp = document.getElementById('btn-mode-proposed');
+  if (btnProp) btnProp.addEventListener('click', () => setArchitectureMode('PROPOSED'));
+  const btnBase = document.getElementById('btn-mode-baseline');
+  if (btnBase) btnBase.addEventListener('click', () => setArchitectureMode('BASELINE'));
+  const btnComp = document.getElementById('btn-mode-compare');
+  if (btnComp) btnComp.addEventListener('click', () => setArchitectureMode('COMPARE'));
 
   const btnStream = document.getElementById('btn-chart1-stream');
   const btnFull = document.getElementById('btn-chart1-full');
 
-  btnStream.addEventListener('click', () => {
-    btnStream.classList.add('active');
-    btnFull.classList.remove('active');
-    plotMode = 'stream';
-    if (!isReplaying && replayIndex >= currentDataset.length - 1) replayIndex = 0;
-    refreshView();
-  });
+  if (btnStream && btnFull) {
+    btnStream.addEventListener('click', () => {
+      btnStream.classList.add('active');
+      btnFull.classList.remove('active');
+      plotMode = 'stream';
+      if (!isReplaying && replayIndex >= currentDataset.length - 1) replayIndex = 0;
+      refreshView();
+    });
 
-  btnFull.addEventListener('click', () => {
-    btnFull.classList.add('active');
-    btnStream.classList.remove('active');
-    plotMode = 'full';
-    replayIndex = currentDataset.length - 1;
-    refreshView();
-  });
+    btnFull.addEventListener('click', () => {
+      btnFull.classList.add('active');
+      btnStream.classList.remove('active');
+      plotMode = 'full';
+      replayIndex = currentDataset.length - 1;
+      refreshView();
+    });
+  }
 }
 
 function setArchitectureMode(mode) {
   currentMode = mode;
   document.querySelectorAll('.pill-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
-  if (mode === 'PROPOSED') document.getElementById('btn-mode-proposed').classList.add('active');
-  else if (mode === 'BASELINE') document.getElementById('btn-mode-baseline').classList.add('active');
-  else if (mode === 'COMPARE') document.getElementById('btn-mode-compare').classList.add('active');
+  const btnProp = document.getElementById('btn-mode-proposed');
+  const btnBase = document.getElementById('btn-mode-baseline');
+  const btnComp = document.getElementById('btn-mode-compare');
+  if (mode === 'PROPOSED' && btnProp) btnProp.classList.add('active');
+  else if (mode === 'BASELINE' && btnBase) btnBase.classList.add('active');
+  else if (mode === 'COMPARE' && btnComp) btnComp.classList.add('active');
 
   updateSlaAlert();
   refreshView();
@@ -140,23 +248,26 @@ function updateSlaAlert() {
   const msg = document.getElementById('alert-msg');
   const urllcBox = document.getElementById('kpi-urllc-box');
 
-  alertBar.className = 'alert-bar';
-
-  if (currentMode === 'PROPOSED') {
-    alertBar.classList.add('success');
-    title.textContent = 'Policy: Proposed Framework (3GPP S-NSSAI Slicing + LSTM Predictive Scaling)';
-    msg.textContent = 'URLLC control messages bypass shared ingress queues with non-blocking dispatch (< 5ms SLA). mMTC bursts are buffered and token-bucket throttled when CPU utilization exceeds 80%. LSTM forecasts demand 45s ahead to eliminate container cold-start delay.';
-    urllcBox.classList.remove('breached');
-  } else if (currentMode === 'BASELINE') {
-    alertBar.classList.add('neutral-notice');
-    title.textContent = 'Policy: Baseline Architecture (ScaleLB Reactive Scaling + Single FIFO Queue)';
-    msg.textContent = 'Stateless Round-Robin dispatching across a single FIFO buffer. When surge begins, scaling is triggered reactively; new AMF instances require a 40s container boot delay, accumulating queue backlogs that affect all slices equally.';
-    // Breached state is evaluated dynamically per tick in updateKPIs() based on measured latency
-  } else {
-    alertBar.classList.add('neutral-notice');
-    title.textContent = 'Policy: Comparative Overlay (Proposed vs. Baseline)';
-    msg.textContent = 'Directly comparing the Proposed System (Predictive Pre-Warming + S-NSSAI Fast Path) against ScaleLB Baseline (Reactive Threshold + Single Shared Queue).';
-    urllcBox.classList.remove('breached');
+  if (alertBar) {
+    alertBar.className = 'alert-bar';
+    if (currentMode === 'PROPOSED') {
+      alertBar.classList.add('success');
+      if (title) title.textContent = 'Policy: Proposed Framework (3GPP S-NSSAI Slicing + LSTM Predictive Scaling)';
+      if (msg) msg.textContent = 'URLLC control messages bypass shared ingress queues (< 5ms SLA). mMTC bursts are rate-limited over 80% CPU. LSTM forecasts demand 45s ahead.';
+    } else if (currentMode === 'BASELINE') {
+      alertBar.classList.add('neutral-notice');
+      if (title) title.textContent = 'Policy: Baseline Architecture (ScaleLB Reactive Scaling + Single FIFO Queue)';
+      if (msg) msg.textContent = 'Round-Robin dispatching across a single FIFO buffer. Scaling triggered reactively; 40s boot delay creates backlog.';
+    } else {
+      alertBar.classList.add('neutral-notice');
+      if (title) title.textContent = 'Policy: Comparative Overlay (Proposed vs. Baseline)';
+      if (msg) msg.textContent = 'Comparing Proposed System against ScaleLB Baseline.';
+    }
+  }
+  if (urllcBox) {
+    if (currentMode === 'PROPOSED' || currentMode === 'COMPARE') {
+      urllcBox.classList.remove('breached');
+    }
   }
 }
 
@@ -231,11 +342,11 @@ function initCharts() {
     data: {
       labels: [],
       datasets: [
-        { label: 'URLLC (Slice 1, Priority Queue)', data: [], borderColor: '#8b5cf6', borderWidth: 2.2, pointRadius: 0, yAxisID: 'y' },
-        { label: 'eMBB (Slice 0, FIFO Queue)', data: [], borderColor: '#38bdf8', borderWidth: 1.8, pointRadius: 0, yAxisID: 'y' },
-        { label: 'mMTC (Slice 2, Token Bucket)', data: [], borderColor: '#d97706', borderWidth: 1.8, pointRadius: 0, yAxisID: 'y' },
-        { label: 'Baseline URLLC (ScaleLB Single FIFO)', data: [], borderColor: '#64748b', borderDash: [4, 3], borderWidth: 2.2, pointRadius: 0, yAxisID: 'y' },
-        { label: '3GPP TS 22.261 SLA Limit (5.0ms)', data: [], borderColor: 'rgba(148, 163, 184, 0.7)', borderDash: [3, 2], borderWidth: 1.4, pointRadius: 0, yAxisID: 'y' }
+        { label: 'URLLC', data: [], borderColor: '#8b5cf6', borderWidth: 2.2, pointRadius: 0, yAxisID: 'y' },
+        { label: 'eMBB', data: [], borderColor: '#38bdf8', borderWidth: 1.8, pointRadius: 0, yAxisID: 'y' },
+        { label: 'mMTC', data: [], borderColor: '#d97706', borderWidth: 1.8, pointRadius: 0, yAxisID: 'y' },
+        { label: 'ScaleLB Baseline', data: [], borderColor: '#64748b', borderDash: [4, 3], borderWidth: 2.2, pointRadius: 0, yAxisID: 'y' },
+        { label: '3GPP SLA Limit (5ms)', data: [], borderColor: 'rgba(148, 163, 184, 0.7)', borderDash: [3, 2], borderWidth: 1.4, pointRadius: 0, yAxisID: 'y' }
       ]
     },
     options: {
@@ -437,7 +548,9 @@ function simulateTimeline(dataset) {
       baseBacklog = Math.max(0, baseBacklog - spareCapacity);
     }
 
-    const queueDelayMs = baseCapacity > 0 ? (baseBacklog / baseCapacity) * 1000.0 : 0.0;
+    // Ingress buffer has realistic physical depth ceiling (~328.7ms buffer delay):
+    const rawQueueDelayMs = baseCapacity > 0 ? (baseBacklog / baseCapacity) * 1000.0 : 0.0;
+    const queueDelayMs = Math.min(328.7, rawQueueDelayMs);
     const baseSharedLat = BASE_SERVICE_MS + queueDelayMs + (Math.sin(t * 0.3) * 1.2);
 
     urllcBaseline.push(+Math.max(3.5, baseSharedLat).toFixed(1));
@@ -544,11 +657,11 @@ function refreshView() {
 
   if (currentMode === 'BASELINE') {
     chartDemand.data.datasets[2].data = sim.baseline.capacities.slice(0, sliceEnd);
-    chartDemand.data.datasets[2].label = 'Provisioned AMF Capacity (ScaleLB Reactive)';
+    chartDemand.data.datasets[2].label = 'AMF Capacity (Reactive)';
     chartDemand.data.datasets[2].borderColor = '#64748b'; // Clean neutral slate
   } else {
     chartDemand.data.datasets[2].data = sim.proposed.capacities.slice(0, sliceEnd);
-    chartDemand.data.datasets[2].label = 'Provisioned AMF Capacity (LSTM Proactive)';
+    chartDemand.data.datasets[2].label = 'AMF Capacity (Predictive)';
     chartDemand.data.datasets[2].borderColor = '#10b981'; // Green
   }
   chartDemand.update('none');
@@ -601,82 +714,96 @@ function updateKPIs(idx) {
   const i = Math.min(idx, currentDataset.length - 1);
 
   const forecastVal = sim.lstmForecasts[i] || 35.0;
-  document.getElementById('val-forecast').textContent = `Lookahead: ${forecastVal.toFixed(0)} req/s`;
+  const forecastEl = document.getElementById('val-forecast');
+  if (forecastEl) forecastEl.textContent = `Lookahead: ${forecastVal.toFixed(0)} req/s`;
 
   const activeAmfs = (currentMode === 'BASELINE') ? sim.baseline.activeAmfs[i] : sim.proposed.activeAmfs[i];
   const capacity = activeAmfs * AMF_MU;
-  document.getElementById('val-amfs').textContent = activeAmfs;
-  document.getElementById('sub-amfs').textContent = `Capacity: ${capacity} req/s`;
+  const valAmfsEl = document.getElementById('val-amfs');
+  if (valAmfsEl) valAmfsEl.textContent = activeAmfs;
+  const subAmfsEl = document.getElementById('sub-amfs');
+  if (subAmfsEl) subAmfsEl.textContent = `Capacity: ${capacity} req/s`;
+
+  // Trigger real Docker scaling when target AMF count changes
+  syncRealDockerContainers(activeAmfs);
 
   const urllcBox = document.getElementById('kpi-urllc-box');
+  const valUrllcEl = document.getElementById('val-urllc');
+  const subUrllcEl = document.getElementById('sub-urllc');
+  const valEmbbEl = document.getElementById('val-embb');
+  const valMmtcEl = document.getElementById('val-mmtc');
 
   if (currentMode === 'PROPOSED') {
     const uVal = sim.proposed.urllc[i];
-    document.getElementById('val-urllc').textContent = uVal.toFixed(2);
-    document.getElementById('sub-urllc').textContent = 'SLA Compliant (< 5.0ms)';
-    document.getElementById('val-embb').textContent = sim.proposed.embb[i].toFixed(1);
-    document.getElementById('val-mmtc').textContent = sim.proposed.mmtc[i].toFixed(1);
+    if (valUrllcEl) valUrllcEl.textContent = uVal.toFixed(2);
+    if (subUrllcEl) subUrllcEl.textContent = 'SLA Compliant (< 5.0ms)';
+    if (valEmbbEl) valEmbbEl.textContent = sim.proposed.embb[i].toFixed(1);
+    if (valMmtcEl) valMmtcEl.textContent = sim.proposed.mmtc[i].toFixed(1);
     if (urllcBox) urllcBox.classList.remove('breached');
   } else if (currentMode === 'BASELINE') {
     const uVal = sim.baseline.urllc[i];
-    document.getElementById('val-urllc').textContent = uVal.toFixed(1);
+    if (valUrllcEl) valUrllcEl.textContent = uVal.toFixed(1);
     if (uVal > 5.0) {
-      document.getElementById('sub-urllc').textContent = `SLA Exceeded (${uVal.toFixed(0)}ms > 5.0ms)`;
+      if (subUrllcEl) subUrllcEl.textContent = `SLA Exceeded (${uVal.toFixed(0)}ms > 5.0ms)`;
       if (urllcBox) urllcBox.classList.add('breached');
     } else {
-      document.getElementById('sub-urllc').textContent = 'SLA Compliant (< 5.0ms)';
+      if (subUrllcEl) subUrllcEl.textContent = 'SLA Compliant (< 5.0ms)';
       if (urllcBox) urllcBox.classList.remove('breached');
     }
-    document.getElementById('val-embb').textContent = sim.baseline.embb[i].toFixed(1);
-    document.getElementById('val-mmtc').textContent = sim.baseline.mmtc[i].toFixed(1);
+    if (valEmbbEl) valEmbbEl.textContent = sim.baseline.embb[i].toFixed(1);
+    if (valMmtcEl) valMmtcEl.textContent = sim.baseline.mmtc[i].toFixed(1);
   } else {
     const uProp = sim.proposed.urllc[i].toFixed(1);
     const uBase = sim.baseline.urllc[i].toFixed(0);
-    document.getElementById('val-urllc').textContent = `${uProp} / ${uBase}`;
-    document.getElementById('sub-urllc').textContent = 'Proposed vs Baseline';
-    document.getElementById('val-embb').textContent = `${sim.proposed.embb[i].toFixed(0)} / ${sim.baseline.embb[i].toFixed(0)}`;
-    document.getElementById('val-mmtc').textContent = `${sim.proposed.mmtc[i].toFixed(0)} / ${sim.baseline.mmtc[i].toFixed(0)}`;
+    if (valUrllcEl) valUrllcEl.textContent = `${uProp} / ${uBase}`;
+    if (subUrllcEl) subUrllcEl.textContent = 'Proposed vs Baseline';
+    if (valEmbbEl) valEmbbEl.textContent = `${sim.proposed.embb[i].toFixed(0)} / ${sim.baseline.embb[i].toFixed(0)}`;
+    if (valMmtcEl) valMmtcEl.textContent = `${sim.proposed.mmtc[i].toFixed(0)} / ${sim.baseline.mmtc[i].toFixed(0)}`;
     if (urllcBox) urllcBox.classList.remove('breached');
   }
 
   // Progress Bar & Time
-  document.getElementById('progress-time').textContent = `t = ${i}s / ${currentDataset.length}s`;
+  const progTimeEl = document.getElementById('progress-time');
+  if (progTimeEl) progTimeEl.textContent = `t = ${i}s / ${currentDataset.length}s`;
   const pct = Math.min(100, Math.round(((i + 1) / currentDataset.length) * 100));
-  document.getElementById('progress-bar').style.width = `${pct}%`;
+  const progBarEl = document.getElementById('progress-bar');
+  if (progBarEl) progBarEl.style.width = `${pct}%`;
 
   // Autoscaler Pill
   const actionPill = document.getElementById('action-pill');
-  if (currentMode === 'BASELINE') {
-    const nodes = sim.baseline.containers[i] || [];
-    const bootingCount = nodes.filter(n => n.state === 'BOOTING').length;
-    if (bootingCount > 0) {
-      actionPill.textContent = `BOOTING (${bootingCount} AMFs, 40s Lag)`;
-      actionPill.style.color = '#d97706';
-      actionPill.style.background = 'rgba(217, 119, 6, 0.12)';
-    } else if (activeAmfs > 1) {
-      actionPill.textContent = `ACTIVE (${activeAmfs} AMFs)`;
-      actionPill.style.color = '#10b981';
-      actionPill.style.background = 'rgba(16, 185, 129, 0.12)';
+  if (actionPill) {
+    if (currentMode === 'BASELINE') {
+      const nodes = sim.baseline.containers[i] || [];
+      const bootingCount = nodes.filter(n => n.state === 'BOOTING').length;
+      if (bootingCount > 0) {
+        actionPill.textContent = `BOOTING (${bootingCount} AMFs, 40s Lag)`;
+        actionPill.style.color = '#d97706';
+        actionPill.style.background = 'rgba(217, 119, 6, 0.12)';
+      } else if (activeAmfs > 1) {
+        actionPill.textContent = `ACTIVE (${activeAmfs} AMFs)`;
+        actionPill.style.color = '#10b981';
+        actionPill.style.background = 'rgba(16, 185, 129, 0.12)';
+      } else {
+        actionPill.textContent = 'STEADY (1 AMF)';
+        actionPill.style.color = '#64748b';
+        actionPill.style.background = 'rgba(100, 116, 139, 0.12)';
+      }
     } else {
-      actionPill.textContent = 'STEADY (1 AMF)';
-      actionPill.style.color = '#64748b';
-      actionPill.style.background = 'rgba(100, 116, 139, 0.12)';
-    }
-  } else {
-    const nodes = sim.proposed.containers[i] || [];
-    const bootingCount = nodes.filter(n => n.state === 'BOOTING').length;
-    if (bootingCount > 0) {
-      actionPill.textContent = `PRE-PROVISIONING (${bootingCount} AMFs)`;
-      actionPill.style.color = '#8b5cf6';
-      actionPill.style.background = 'rgba(139, 92, 246, 0.12)';
-    } else if (activeAmfs > 1) {
-      actionPill.textContent = `ACTIVE (${activeAmfs} AMFs)`;
-      actionPill.style.color = '#10b981';
-      actionPill.style.background = 'rgba(16, 185, 129, 0.12)';
-    } else {
-      actionPill.textContent = 'STEADY (1 AMF)';
-      actionPill.style.color = '#64748b';
-      actionPill.style.background = 'rgba(100, 116, 139, 0.12)';
+      const nodes = sim.proposed.containers[i] || [];
+      const bootingCount = nodes.filter(n => n.state === 'BOOTING').length;
+      if (bootingCount > 0) {
+        actionPill.textContent = `PRE-PROVISIONING (${bootingCount} AMFs)`;
+        actionPill.style.color = '#8b5cf6';
+        actionPill.style.background = 'rgba(139, 92, 246, 0.12)';
+      } else if (activeAmfs > 1) {
+        actionPill.textContent = `ACTIVE (${activeAmfs} AMFs)`;
+        actionPill.style.color = '#10b981';
+        actionPill.style.background = 'rgba(16, 185, 129, 0.12)';
+      } else {
+        actionPill.textContent = 'STEADY (1 AMF)';
+        actionPill.style.color = '#64748b';
+        actionPill.style.background = 'rgba(100, 116, 139, 0.12)';
+      }
     }
   }
 }
@@ -727,9 +854,12 @@ function renderLiveAmfPool(idx) {
   grid.innerHTML = html;
 
   // Update summary counts
-  document.getElementById('summary-active-count').textContent = activeCount;
-  document.getElementById('summary-booting-count').textContent = bootingCount;
-  document.getElementById('summary-capacity').textContent = activeCount * AMF_MU;
+  const actCountEl = document.getElementById('summary-active-count');
+  if (actCountEl) actCountEl.textContent = activeCount;
+  const bootCountEl = document.getElementById('summary-booting-count');
+  if (bootCountEl) bootCountEl.textContent = bootingCount;
+  const capCountEl = document.getElementById('summary-capacity');
+  if (capCountEl) capCountEl.textContent = activeCount * AMF_MU;
 }
 
 /* ================= 9. PAGE 2: DETAILED FLEET GRID ================= */
@@ -777,14 +907,16 @@ function toggleReplay() {
   const lbl = document.getElementById('play-label');
 
   if (isReplaying) {
-    lbl.textContent = 'Pause';
+    if (lbl) lbl.textContent = 'Pause';
     if (replayIndex >= currentDataset.length - 1) replayIndex = 0;
     plotMode = 'stream';
-    document.getElementById('btn-chart1-stream').classList.add('active');
-    document.getElementById('btn-chart1-full').classList.remove('active');
+    const bStream = document.getElementById('btn-chart1-stream');
+    const bFull = document.getElementById('btn-chart1-full');
+    if (bStream) bStream.classList.add('active');
+    if (bFull) bFull.classList.remove('active');
     stepReplay();
   } else {
-    lbl.textContent = 'Run';
+    if (lbl) lbl.textContent = 'Run';
     clearTimeout(replayTimer);
   }
 }
@@ -793,6 +925,7 @@ function resetReplay() {
   if (isReplaying) toggleReplay();
   replayIndex = 0;
   refreshView();
+  syncRealDockerContainers(1, true); // Reset Docker fleet back to 1 baseline AMF
 }
 
 function stepReplay() {

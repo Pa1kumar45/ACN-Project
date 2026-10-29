@@ -152,6 +152,11 @@ body.dark-theme {
   box-shadow: 0 0 6px var(--green);
 }
 
+.status-indicator.standby .status-dot {
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
 /* ================= PAGE CONTAINER & TABS ================= */
 .page-container {
   max-width: 1440px;

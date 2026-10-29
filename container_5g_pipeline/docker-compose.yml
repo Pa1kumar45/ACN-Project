@@ -8,17 +8,16 @@ services:
       - "8383:8383"
     environment:
       - PORT=8383
-      - AMF_ENDPOINTS=http://amf-worker-1:8000,http://amf-worker-2:8000,http://amf-worker-3:8000
+      - AMF_ENDPOINTS=http://amf-worker:8000
     networks:
       - 5g-net
     depends_on:
-      - amf-worker-1
+      - amf-worker
 
-  amf-worker-1:
+  amf-worker:
     build: ./services/amf_worker
-    container_name: amf-worker-1
     environment:
-      - AMF_ID=amf-worker-1
+      - AMF_ID=amf-worker
       - PORT=8000
       - SERVICE_TIME_MS=10.0
       - BOOT_DELAY_SEC=2.0
@@ -32,6 +31,8 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace
+    working_dir: /workspace
     environment:
       - LB_URL=http://loadbalancer:8383/metrics
       - PORT=8080
